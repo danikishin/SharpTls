@@ -40,7 +40,7 @@ internal static class ServerCertificateValidator
 
         if (!chain.Build(message.Leaf))
         {
-            throw MapChainFailure(chain, policy.CustomTrustRoots);
+            throw MapChainFailure(chain, message, policy);
         }
 
         var normalizedName = NormalizeReferenceIdentity(serverName);
@@ -214,7 +214,8 @@ internal static class ServerCertificateValidator
 
     private static TlsProtocolException MapChainFailure(
         X509Chain chain,
-        X509Certificate2Collection? customTrustRoots)
+        ServerCertificateMessage message,
+        CertificateValidationPolicy policy)
     {
         var statuses = chain.ChainStatus;
         if (statuses.Any(status => (status.Status & X509ChainStatusFlags.Revoked) != 0))
@@ -232,8 +233,9 @@ internal static class ServerCertificateValidator
         {
             return new TlsProtocolException(TlsAlertDescription.UnknownCa, "Certificate chain is not trusted.");
         }
-        if (customTrustRoots is { Count: > 0 } &&
-            !TerminatesAtCustomTrustRoot(chain, customTrustRoots))
+        if (policy.CustomTrustRoots is { Count: > 0 } customTrustRoots &&
+            (!TerminatesAtCustomTrustRoot(chain, customTrustRoots) ||
+             PresentedChainIsValidUnderItsOwnRoot(message, policy)))
         {
             return new TlsProtocolException(
                 TlsAlertDescription.UnknownCa,
@@ -246,6 +248,39 @@ internal static class ServerCertificateValidator
         return new TlsProtocolException(
             TlsAlertDescription.BadCertificate,
             $"Certificate chain validation failed: {details}.");
+    }
+
+    private static bool PresentedChainIsValidUnderItsOwnRoot(
+        ServerCertificateMessage message,
+        CertificateValidationPolicy policy)
+    {
+        if (message.Certificates.Count < 2)
+        {
+            return false;
+        }
+
+        var presentedRoot = message.Certificates[^1];
+        if (!presentedRoot.SubjectName.RawData.AsSpan().SequenceEqual(
+                presentedRoot.IssuerName.RawData))
+        {
+            return false;
+        }
+
+        using var presentedChain = new X509Chain();
+        presentedChain.ChainPolicy.RevocationMode = policy.RevocationMode;
+        presentedChain.ChainPolicy.RevocationFlag = policy.RevocationFlag;
+        presentedChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
+        presentedChain.ChainPolicy.DisableCertificateDownloads = policy.DisableCertificateDownloads;
+        presentedChain.ChainPolicy.UrlRetrievalTimeout = policy.UrlRetrievalTimeout;
+        presentedChain.ChainPolicy.ApplicationPolicy.Add(new Oid(ServerAuthenticationOid));
+        for (var index = 1; index < message.Certificates.Count - 1; index++)
+        {
+            presentedChain.ChainPolicy.ExtraStore.Add(message.Certificates[index]);
+        }
+        presentedChain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+        presentedChain.ChainPolicy.CustomTrustStore.Add(presentedRoot);
+
+        return presentedChain.Build(message.Leaf);
     }
 
     private static bool TerminatesAtCustomTrustRoot(
