@@ -22,10 +22,11 @@ SharpTls implements TLS directly over caller-owned `Socket`, `NetworkStream`, or
 libraries, P/Invoke, proxies, external processes, or another TLS implementation.
 
 > [!IMPORTANT]
-> SharpTls is a pre-1.0 cryptographic protocol library. Its implemented surface is
-> heavily tested, but independent cryptographic review and hosted release evidence
-> remain explicit 1.0 gates. Read the [security policy](SECURITY.md) and
-> [release-hardening gates](docs/RELEASE-HARDENING.md) before production adoption.
+> SharpTls is currently a pre-1.0 cryptographic protocol library. The implemented
+> surface is extensively tested, but public APIs may still evolve before 1.0.
+> Security-sensitive deployments should review the [security policy](SECURITY.md),
+> [threat model](docs/THREAT-MODEL.md), and
+> [platform/provider matrix](docs/PLATFORM-PROVIDERS.md) before adoption.
 
 ## Why SharpTls?
 
@@ -46,12 +47,6 @@ secure TLS policy.
 
 ```shell
 dotnet add package SharpTls --prerelease
-```
-
-Or reference the project while developing locally:
-
-```shell
-dotnet add reference src/SharpTls/SharpTls.csproj
 ```
 
 ## Five-minute client
@@ -247,48 +242,68 @@ framing, ClientHello specifications, key exchange, key schedules, certificate lo
 client/server state machines, sessions, ECH, DNS discovery and QUIC-TLS adapters. It is
 not one opaque connection class.
 
-## Build and verify
+## Quality and verification
+
+SharpTls is tested as a protocol implementation, not only as a collection of successful
+connection examples. The repository includes RFC and cryptographic vectors, malformed
+and hostile-input cases, strict state-machine tests, managed fuzz targets, allocation
+budgets, real-server interoperability tests, API compatibility checks and deterministic
+package verification.
+
+Published releases are gated by:
+
+- Release builds and deterministic tests on Linux, macOS and Windows.
+- Public TLS interoperability across the executable fingerprint catalog.
+- Managed and coverage-guided parser/state-machine fuzzing.
+- Byte-for-byte reproducible `.nupkg` and `.snupkg` artifacts.
+- Restore and build from a clean consumer project.
+- GitHub build-provenance attestations for release assets.
+
+To verify a source checkout locally:
 
 ```shell
 dotnet restore SharpTls.slnx
 dotnet test SharpTls.slnx --configuration Release
-dotnet run --project tools/SharpTls.Fuzz --configuration Release -- --iterations 10000
-dotnet run --project benchmarks/SharpTls.Benchmarks --configuration Release -- --verify
+dotnet run --project tools/SharpTls.Fuzz/SharpTls.Fuzz.csproj \
+  --configuration Release -- --iterations 10000
+dotnet run --project benchmarks/SharpTls.Benchmarks/SharpTls.Benchmarks.csproj \
+  --configuration Release -- --verify
 ```
 
-The hosted workflow runs the deterministic suite on Linux, macOS and Windows. Release
-tags additionally require public interoperability, coverage-guided fuzzing,
-byte-for-byte reproducible NuGet packages, clean-consumer restore, build provenance and
-GitHub Release publication before an optional NuGet.org push.
+## Documentation
 
-## Documentation map
-
-| Start here | Deep dives |
+| I want to… | Read |
 |---|---|
-| [Roadmap](docs/ROADMAP.md) | [ClientHello specifications](docs/CLIENTHELLO-SPECS.md) |
-| [uTLS parity](docs/UTLS-PARITY.md) | [Capture import and JSON](docs/CLIENTHELLO-IMPORT.md) |
-| [Profile catalog](docs/PROFILE-CATALOG.md) | [Randomization and Roller](docs/RANDOMIZATION.md) |
-| [Transports and streams](docs/TRANSPORTS.md) | [TLS 1.2 policy](docs/TLS12.md) |
-| [Server engine](docs/SERVER-ENGINE.md) | [QUIC-TLS adapter](docs/QUIC-TLS.md) |
-| [ECH](docs/ENCRYPTED-CLIENT-HELLO.md) | [ECH DNS bootstrap](docs/ECH-DNS-BOOTSTRAP.md) |
-| [Resumption and early data](docs/RESUMPTION-EARLY-DATA.md) | [Client authentication](docs/CLIENT-AUTHENTICATION.md) |
-| [Interoperability](docs/INTEROPERABILITY.md) | [Release hardening](docs/RELEASE-HARDENING.md) |
-| [Threat model](docs/THREAT-MODEL.md) | [Security policy](SECURITY.md) |
+| Connect through a caller-owned transport and use the TLS stream | [Transports and streams](docs/TRANSPORTS.md) |
+| Design an exact semantic/raw ClientHello | [ClientHello specifications](docs/CLIENTHELLO-SPECS.md) |
+| Select and understand a pinned fingerprint | [Profile catalog](docs/PROFILE-CATALOG.md) and [uTLS profiles](docs/UTLS-PROFILES.md) |
+| Import a capture or round-trip JSON | [Capture import and JSON](docs/CLIENTHELLO-IMPORT.md) |
+| Generate coherent fingerprints or use Roller | [Randomization and Roller](docs/RANDOMIZATION.md) |
+| Configure resumption, PSK or replay-aware 0-RTT | [Resumption and early data](docs/RESUMPTION-EARLY-DATA.md) |
+| Configure ECH and HTTPS/SVCB discovery | [Encrypted ClientHello](docs/ENCRYPTED-CLIENT-HELLO.md) and [ECH DNS bootstrap](docs/ECH-DNS-BOOTSTRAP.md) |
+| Host a managed TLS endpoint | [Server engine](docs/SERVER-ENGINE.md) |
+| Integrate TLS with a QUIC transport | [QUIC-TLS adapter](docs/QUIC-TLS.md) |
+| Understand the exact TLS 1.2 boundary | [TLS 1.2 policy](docs/TLS12.md) |
+| Compare the implemented surface with upstream uTLS | [uTLS parity](docs/UTLS-PARITY.md) |
+| Evaluate security and platform-provider constraints | [Security policy](SECURITY.md), [threat model](docs/THREAT-MODEL.md), and [provider matrix](docs/PLATFORM-PROVIDERS.md) |
 
-## Releases
+The [engineering roadmap](docs/ROADMAP.md) records milestone history and future protocol
+work. [Interoperability](docs/INTEROPERABILITY.md) documents the real-server and packet
+capture procedure.
 
-Push a SemVer tag beginning with `v` after updating the changelog:
+## Packages and release integrity
 
-```shell
-git tag -a v0.9.0-preview.2 -m "SharpTls v0.9.0-preview.2"
-git push origin v0.9.0-preview.2
-```
+Preview builds are distributed through [NuGet](https://www.nuget.org/packages/SharpTls)
+and follow Semantic Versioning. Each published version includes:
 
-After every release gate passes, GitHub Actions creates normalized `.nupkg` and
-`.snupkg` files, attests them and attaches them to a GitHub Release. Configure NuGet
-Trusted Publishing and add the NuGet profile name as `NUGET_USER` to publish with a
-short-lived OIDC credential. `NUGET_API_KEY` remains an optional fallback where Trusted
-Publishing is unavailable. See [the release guide](docs/RELEASING.md).
+- the managed `net9.0` assembly and XML API documentation;
+- a matching portable-symbol `.snupkg`;
+- the package README, license, changelog, security policy and protocol documentation;
+- the exact package files attached to the corresponding GitHub Release; and
+- GitHub build-provenance attestations for release artifacts.
+
+Package versions are immutable. Review [CHANGELOG.md](CHANGELOG.md) for behavior and API
+changes when upgrading between previews.
 
 ## Contributing and security
 
