@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+TestResults/
+artifacts/
+captures/*.pcapng
+.DS_Store
+Thumbs.db
+*.nupkg
+*.snupkg
+*.pfx
+*.key
+*.pem
+!.github/assets/*.png

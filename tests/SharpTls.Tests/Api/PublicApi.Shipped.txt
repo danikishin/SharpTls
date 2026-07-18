@@ -1,0 +1,1005 @@
+T: public interface SharpTls.Certificates.ITlsClientCertificateSigner
+  M: public abstract System.Byte[] ExportSubjectPublicKeyInfo()
+  M: public abstract System.Threading.Tasks.ValueTask<System.Byte[]> SignHashAsync(SharpTls.Protocol.SignatureScheme scheme, System.ReadOnlyMemory<System.Byte> hash, System.Threading.CancellationToken cancellationToken = default)
+  P: public System.Collections.Generic.IReadOnlyCollection<SharpTls.Protocol.SignatureScheme> SupportedSignatureSchemes { get; }
+T: public sealed class SharpTls.Certificates.TlsClientCertificate : System.IDisposable
+  C: public SharpTls.Certificates.TlsClientCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafCertificate, SharpTls.Certificates.ITlsClientCertificateSigner signer, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default)
+  C: public SharpTls.Certificates.TlsClientCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafCertificate, System.Security.Cryptography.RSA privateKey, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default)
+  C: public SharpTls.Certificates.TlsClientCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafWithPrivateKey, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default)
+  M: public System.Void AttachDelegatedCredential(SharpTls.Certificates.TlsClientDelegatedCredential delegatedCredential)
+  M: public System.Void Dispose()
+  P: public System.Int32 CertificateCount { get; }
+T: public sealed class SharpTls.Certificates.TlsClientCertificateSelectionContext
+  P: public SharpTls.Protocol.TlsProtocolVersion ProtocolVersion { get; }
+  P: public System.Boolean IsPostHandshake { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> DelegatedCredentialSignatureSchemes { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> SignatureSchemes { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte> CertificateTypes { get; }
+  P: public System.String ServerName { get; }
+T: public delegate System.Threading.Tasks.ValueTask<SharpTls.Certificates.TlsClientCertificate?> SharpTls.Certificates.TlsClientCertificateSelector(SharpTls.Certificates.TlsClientCertificateSelectionContext context, System.Threading.CancellationToken cancellationToken)
+T: public sealed class SharpTls.Certificates.TlsClientDelegatedCredential : System.IDisposable
+  C: public SharpTls.Certificates.TlsClientDelegatedCredential(System.ReadOnlySpan<System.Byte> encodedCredential, SharpTls.Certificates.ITlsClientCertificateSigner signer)
+  M: public System.Void Dispose()
+  P: public SharpTls.Protocol.SignatureScheme CertificateVerifyAlgorithm { get; }
+  P: public SharpTls.Protocol.SignatureScheme DelegationSignatureAlgorithm { get; }
+  P: public System.DateTimeOffset? ExpiresAt { get; }
+  P: public System.UInt32 ValidTimeSeconds { get; }
+T: public sealed class SharpTls.Certificates.TlsServerCertificate : System.IDisposable
+  C: public SharpTls.Certificates.TlsServerCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafCertificate, System.Security.Cryptography.ECDsa privateKey, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default, SharpTls.Certificates.TlsServerCertificatePresentation? presentation = default)
+  C: public SharpTls.Certificates.TlsServerCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafCertificate, System.Security.Cryptography.RSA privateKey, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default, SharpTls.Certificates.TlsServerCertificatePresentation? presentation = default)
+  C: public SharpTls.Certificates.TlsServerCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 leafWithPrivateKey, System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>? issuerCertificates = default, SharpTls.Certificates.TlsServerCertificatePresentation? presentation = default)
+  M: public System.Void Dispose()
+  P: public System.Int32 CertificateCount { get; }
+T: public sealed class SharpTls.Certificates.TlsServerCertificateEvidence
+  P: public SharpTls.Protocol.TlsProtocolVersion ProtocolVersion { get; }
+  P: public System.Byte[]? StapledOcspResponse { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> CertificateChain { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> SignedCertificateTimestamps { get; }
+  P: public System.String ServerName { get; }
+T: public sealed class SharpTls.Certificates.TlsServerCertificateEvidenceValidationResult : System.IEquatable<SharpTls.Certificates.TlsServerCertificateEvidenceValidationResult>
+  C: public SharpTls.Certificates.TlsServerCertificateEvidenceValidationResult(SharpTls.Certificates.TlsStapledOcspValidationStatus stapledOcspStatus, System.Int32 validSignedCertificateTimestampCount)
+  P: public SharpTls.Certificates.TlsStapledOcspValidationStatus StapledOcspStatus { get; }
+  P: public System.Int32 ValidSignedCertificateTimestampCount { get; }
+T: public delegate System.Threading.Tasks.ValueTask<SharpTls.Certificates.TlsServerCertificateEvidenceValidationResult> SharpTls.Certificates.TlsServerCertificateEvidenceValidator(SharpTls.Certificates.TlsServerCertificateEvidence evidence, System.Threading.CancellationToken cancellationToken)
+T: public sealed class SharpTls.Certificates.TlsServerCertificatePresentation
+  C: public SharpTls.Certificates.TlsServerCertificatePresentation(System.ReadOnlyMemory<System.Byte>? stapledOcspResponse = default, System.Collections.Generic.IEnumerable<System.Byte[]>? signedCertificateTimestamps = default)
+T: public enum SharpTls.Certificates.TlsStapledOcspValidationStatus : System.Int32
+  F: public const SharpTls.Certificates.TlsStapledOcspValidationStatus Good = SharpTls.Certificates.TlsStapledOcspValidationStatus.Good
+  F: public const SharpTls.Certificates.TlsStapledOcspValidationStatus Invalid = SharpTls.Certificates.TlsStapledOcspValidationStatus.Invalid
+  F: public const SharpTls.Certificates.TlsStapledOcspValidationStatus NotChecked = SharpTls.Certificates.TlsStapledOcspValidationStatus.NotChecked
+  F: public const SharpTls.Certificates.TlsStapledOcspValidationStatus Revoked = SharpTls.Certificates.TlsStapledOcspValidationStatus.Revoked
+  F: public const SharpTls.Certificates.TlsStapledOcspValidationStatus Unknown = SharpTls.Certificates.TlsStapledOcspValidationStatus.Unknown
+T: public sealed class SharpTls.ClientHelloAlpnVariant
+  C: public SharpTls.ClientHelloAlpnVariant(System.Int32 weight, params System.String[] protocols)
+  P: public System.Collections.Generic.IReadOnlyList<System.String> Protocols { get; }
+  P: public System.Int32 Weight { get; }
+T: public sealed class SharpTls.ClientHelloBuilder
+  C: public SharpTls.ClientHelloBuilder()
+  M: public SharpTls.ClientHelloBuilder AllowDuplicateSignatureAlgorithms(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder AllowUnsupportedDelegatedCredentialAlgorithmsForWireFidelity(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithAlpn(params System.String[] protocols)
+  M: public SharpTls.ClientHelloBuilder WithApplicationSettings(SharpTls.TlsApplicationSettingsCodePoint codePoint, params System.String[] protocols)
+  M: public SharpTls.ClientHelloBuilder WithBoringPadding()
+  M: public SharpTls.ClientHelloBuilder WithCertificateSignatureAlgorithms(params SharpTls.Protocol.SignatureScheme[]? algorithms)
+  M: public SharpTls.ClientHelloBuilder WithCipherSuites(params SharpTls.Protocol.TlsCipherSuite[] cipherSuites)
+  M: public SharpTls.ClientHelloBuilder WithDelegatedCredentials(params SharpTls.Protocol.SignatureScheme[]? algorithms)
+  M: public SharpTls.ClientHelloBuilder WithExtensionLayout(params SharpTls.ClientHelloExtensionSpec[] extensions)
+  M: public SharpTls.ClientHelloBuilder WithExtensionOrder(params SharpTls.ClientHelloExtensionKind[] order)
+  M: public SharpTls.ClientHelloBuilder WithExtensionShuffling(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithGrease(SharpTls.ClientHelloGreasePolicy policy)
+  M: public SharpTls.ClientHelloBuilder WithGrease(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithGreaseEncryptedClientHello(System.Collections.Generic.IReadOnlyList<SharpTls.TlsHpkeSymmetricCipherSuite> cipherSuites, params System.Int32[] payloadLengths)
+  M: public SharpTls.ClientHelloBuilder WithGreaseEncryptedClientHello(params System.Int32[] payloadLengths)
+  M: public SharpTls.ClientHelloBuilder WithGreaseKeyShareBody(System.Byte[]? body)
+  M: public SharpTls.ClientHelloBuilder WithKeyShares(params SharpTls.Protocol.NamedGroup[] groups)
+  M: public SharpTls.ClientHelloBuilder WithLegacyTls12ClientHello()
+  M: public SharpTls.ClientHelloBuilder WithPadding(System.Int32? paddingLength)
+  M: public SharpTls.ClientHelloBuilder WithPostHandshakeAuthentication(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithQuicTransportParameters(SharpTls.Quic.TlsQuicTransportParameters? transportParameters)
+  M: public SharpTls.ClientHelloBuilder WithRecordSizeLimit(System.Int32? maximumProtectedPlaintextLength)
+  M: public SharpTls.ClientHelloBuilder WithSecondaryGreaseExtension(System.Byte[]? body)
+  M: public SharpTls.ClientHelloBuilder WithSessionId(System.Byte[]? sessionId)
+  M: public SharpTls.ClientHelloBuilder WithSessionResumption(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithSignatureAlgorithms(params SharpTls.Protocol.SignatureScheme[] algorithms)
+  M: public SharpTls.ClientHelloBuilder WithSni(System.Boolean enabled = true)
+  M: public SharpTls.ClientHelloBuilder WithSupportedGroups(params SharpTls.Protocol.NamedGroup[] groups)
+  M: public SharpTls.ClientHelloBuilder WithSupportedVersions(params SharpTls.Protocol.TlsProtocolVersion[] versions)
+  M: public SharpTls.ClientHelloBuilder WithTls13()
+  M: public SharpTls.ClientHelloSpec BuildSpec()
+T: public static class SharpTls.ClientHelloCapture
+  M: public static SharpTls.ClientHelloCaptureResult Import(System.ReadOnlySpan<System.Byte> input, SharpTls.ClientHelloCaptureFormat format = SharpTls.ClientHelloCaptureFormat.Auto, SharpTls.ClientHelloImportOptions? options = default)
+T: public enum SharpTls.ClientHelloCaptureFormat : System.Int32
+  F: public const SharpTls.ClientHelloCaptureFormat Auto = SharpTls.ClientHelloCaptureFormat.Auto
+  F: public const SharpTls.ClientHelloCaptureFormat Handshake = SharpTls.ClientHelloCaptureFormat.Handshake
+  F: public const SharpTls.ClientHelloCaptureFormat TlsRecords = SharpTls.ClientHelloCaptureFormat.TlsRecords
+T: public sealed class SharpTls.ClientHelloCaptureResult
+  M: public SharpTls.TlsRecordFragmentation? CreateRecordFragmentation()
+  P: public SharpTls.ClientHelloSpec Spec { get; }
+  P: public System.Boolean WasRecordFramed { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> RecordFragmentSizes { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.UInt16> RecordVersions { get; }
+  P: public System.String? CapturedServerName { get; }
+T: public enum SharpTls.ClientHelloExtensionKind : System.Int32
+  F: public const SharpTls.ClientHelloExtensionKind ApplicationLayerProtocolNegotiation = SharpTls.ClientHelloExtensionKind.ApplicationLayerProtocolNegotiation
+  F: public const SharpTls.ClientHelloExtensionKind ApplicationSettings = SharpTls.ClientHelloExtensionKind.ApplicationSettings
+  F: public const SharpTls.ClientHelloExtensionKind Cookie = SharpTls.ClientHelloExtensionKind.Cookie
+  F: public const SharpTls.ClientHelloExtensionKind DelegatedCredential = SharpTls.ClientHelloExtensionKind.DelegatedCredential
+  F: public const SharpTls.ClientHelloExtensionKind EarlyData = SharpTls.ClientHelloExtensionKind.EarlyData
+  F: public const SharpTls.ClientHelloExtensionKind EncryptedClientHello = SharpTls.ClientHelloExtensionKind.EncryptedClientHello
+  F: public const SharpTls.ClientHelloExtensionKind Grease = SharpTls.ClientHelloExtensionKind.Grease
+  F: public const SharpTls.ClientHelloExtensionKind KeyShare = SharpTls.ClientHelloExtensionKind.KeyShare
+  F: public const SharpTls.ClientHelloExtensionKind Padding = SharpTls.ClientHelloExtensionKind.Padding
+  F: public const SharpTls.ClientHelloExtensionKind PostHandshakeAuthentication = SharpTls.ClientHelloExtensionKind.PostHandshakeAuthentication
+  F: public const SharpTls.ClientHelloExtensionKind PreSharedKey = SharpTls.ClientHelloExtensionKind.PreSharedKey
+  F: public const SharpTls.ClientHelloExtensionKind PskKeyExchangeModes = SharpTls.ClientHelloExtensionKind.PskKeyExchangeModes
+  F: public const SharpTls.ClientHelloExtensionKind QuicTransportParameters = SharpTls.ClientHelloExtensionKind.QuicTransportParameters
+  F: public const SharpTls.ClientHelloExtensionKind RecordSizeLimit = SharpTls.ClientHelloExtensionKind.RecordSizeLimit
+  F: public const SharpTls.ClientHelloExtensionKind SecondaryGrease = SharpTls.ClientHelloExtensionKind.SecondaryGrease
+  F: public const SharpTls.ClientHelloExtensionKind ServerName = SharpTls.ClientHelloExtensionKind.ServerName
+  F: public const SharpTls.ClientHelloExtensionKind SignatureAlgorithms = SharpTls.ClientHelloExtensionKind.SignatureAlgorithms
+  F: public const SharpTls.ClientHelloExtensionKind SignatureAlgorithmsCert = SharpTls.ClientHelloExtensionKind.SignatureAlgorithmsCert
+  F: public const SharpTls.ClientHelloExtensionKind SupportedGroups = SharpTls.ClientHelloExtensionKind.SupportedGroups
+  F: public const SharpTls.ClientHelloExtensionKind SupportedVersions = SharpTls.ClientHelloExtensionKind.SupportedVersions
+T: public sealed class SharpTls.ClientHelloExtensionSpec
+  M: public System.Byte[] GetRawData()
+  M: public static SharpTls.ClientHelloExtensionSpec BuiltIn(SharpTls.ClientHelloExtensionKind kind)
+  M: public static SharpTls.ClientHelloExtensionSpec Raw(System.UInt16 extensionType, System.Byte[] data)
+  P: public SharpTls.ClientHelloExtensionKind? BuiltInKind { get; }
+  P: public System.UInt16? RawExtensionType { get; }
+T: public sealed class SharpTls.ClientHelloGreasePolicy
+  M: public System.Int32 GetValueClass(SharpTls.ClientHelloGreaseSlot slot)
+  M: public static SharpTls.ClientHelloGreasePolicy Create(System.Int32 cipherSuiteClass, System.Int32 supportedVersionClass, System.Int32 supportedGroupClass, System.Int32 keyShareClass, System.Int32 extensionClass)
+  M: public static SharpTls.ClientHelloGreasePolicy CreateWithSecondaryExtension(System.Int32 cipherSuiteClass, System.Int32 supportedVersionClass, System.Int32 supportedGroupClass, System.Int32 keyShareClass, System.Int32 extensionClass, System.Int32 secondaryExtensionClass)
+  P: public SharpTls.ClientHelloGreasePolicy Consistent { get; }
+  P: public SharpTls.ClientHelloGreasePolicy PerSlot { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> ValueClasses { get; }
+  P: public System.Int32 DistinctValueCount { get; }
+  P: public System.Int32 SecondaryExtensionValueClass { get; }
+T: public enum SharpTls.ClientHelloGreaseSlot : System.Int32
+  F: public const SharpTls.ClientHelloGreaseSlot CipherSuite = SharpTls.ClientHelloGreaseSlot.CipherSuite
+  F: public const SharpTls.ClientHelloGreaseSlot Extension = SharpTls.ClientHelloGreaseSlot.Extension
+  F: public const SharpTls.ClientHelloGreaseSlot KeyShare = SharpTls.ClientHelloGreaseSlot.KeyShare
+  F: public const SharpTls.ClientHelloGreaseSlot SecondaryExtension = SharpTls.ClientHelloGreaseSlot.SecondaryExtension
+  F: public const SharpTls.ClientHelloGreaseSlot SupportedGroup = SharpTls.ClientHelloGreaseSlot.SupportedGroup
+  F: public const SharpTls.ClientHelloGreaseSlot SupportedVersion = SharpTls.ClientHelloGreaseSlot.SupportedVersion
+T: public sealed class SharpTls.ClientHelloImportOptions
+  C: public SharpTls.ClientHelloImportOptions()
+  P: public System.Boolean PreserveSessionId { get; set; }
+  P: public System.Int32 MaximumInputSize { get; set; }
+T: public sealed class SharpTls.ClientHelloProfile
+  M: public System.Byte[] BuildDeterministicForTesting(System.String serverName, System.Byte[] seed)
+  P: public SharpTls.ClientHelloSpec Spec { get; }
+T: public sealed class SharpTls.ClientHelloProfileCatalog
+  C: public SharpTls.ClientHelloProfileCatalog()
+  M: public SharpTls.ClientHelloProfileManifest GetRequired(System.String id)
+  M: public System.Boolean TryGet(System.String id, out SharpTls.ClientHelloProfileManifest? manifest)
+  M: public System.Void Register(SharpTls.ClientHelloProfileManifest manifest)
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.ClientHelloProfileManifest> Profiles { get; }
+T: public sealed class SharpTls.ClientHelloProfileManifest
+  M: public SharpTls.ClientHelloProfile CreateProfile()
+  M: public static SharpTls.ClientHelloProfileManifest Import(System.String id, System.String family, System.String version, System.DateTimeOffset capturedAt, System.ReadOnlySpan<System.Byte> sourceCapture, SharpTls.ClientHelloCaptureFormat format = SharpTls.ClientHelloCaptureFormat.Auto, SharpTls.ClientHelloImportOptions? importOptions = default)
+  P: public SharpTls.ClientHelloSpec Spec { get; }
+  P: public System.Boolean SourceWasRecordFramed { get; }
+  P: public System.Byte[] SourceSha256 { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> RequiredApplicationProtocols { get; }
+  P: public System.DateTimeOffset CapturedAt { get; }
+  P: public System.String Family { get; }
+  P: public System.String Id { get; }
+  P: public System.String Version { get; }
+  P: public System.String? CapturedServerName { get; }
+T: public static class SharpTls.ClientHelloProfileRandomizer
+  M: public static SharpTls.ClientHelloProfile CreateDeterministicForTesting(System.Byte[] seed, SharpTls.ClientHelloRandomizationOptions? options = default)
+  M: public static SharpTls.ClientHelloProfile CreateSecure(SharpTls.ClientHelloRandomizationOptions? options = default)
+T: public sealed class SharpTls.ClientHelloProfileRoller
+  C: public SharpTls.ClientHelloProfileRoller(SharpTls.ClientHelloRollerOptions? options = default)
+  M: public System.Threading.Tasks.ValueTask<SharpTls.CustomTlsClient> ConnectAsync(SharpTls.CustomTlsClientOptions baseOptions, System.String host, System.Int32 port, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Void ClearCache()
+  P: public System.Int32 CachedOriginCount { get; }
+T: public static class SharpTls.ClientHelloProfiles
+  M: public static SharpTls.ClientHelloProfile Custom(System.Action<SharpTls.ClientHelloBuilder> configure)
+  M: public static SharpTls.ClientHelloProfile FromSpec(SharpTls.ClientHelloSpec spec)
+  P: public SharpTls.ClientHelloProfile ModernTls13 { get; }
+  P: public SharpTls.ClientHelloProfile UTls360Auto { get; }
+  P: public SharpTls.ClientHelloProfile UTls360_11_0 { get; }
+  P: public SharpTls.ClientHelloProfile UTls360_7_5 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsAndroid11OkHttp { get; }
+  P: public SharpTls.ClientHelloProfile UTlsAndroidAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome100 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome100Psk { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome102 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome106Shuffle { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome112PskShuffle { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome114PaddingPskShuffle { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome115Pq { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome115PqPsk { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome120 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome120Pq { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome131 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome133 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome58 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome62 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome70 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome72 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome83 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome87 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChrome96 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsChromeAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsEdge106 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsEdge85 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsEdgeAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox102 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox105 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox120 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox148 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox55 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox56 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox63 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox65 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefox99 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsFirefoxAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsIOS11_1 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsIOS12_1 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsIOS13 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsIOS14 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsIOSAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsQQ11_1 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsQQAuto { get; }
+  P: public SharpTls.ClientHelloProfile UTlsSafari16 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsSafari263 { get; }
+  P: public SharpTls.ClientHelloProfile UTlsSafariAuto { get; }
+T: public sealed class SharpTls.ClientHelloRandomizationOptions
+  C: public SharpTls.ClientHelloRandomizationOptions()
+  P: public SharpTls.ClientHelloGreasePolicy GreasePolicy { get; set; }
+  P: public SharpTls.TlsApplicationSettingsCodePoint ApplicationSettingsCodePoint { get; set; }
+  P: public System.Boolean EnableSessionResumption { get; set; }
+  P: public System.Boolean ShuffleExtensions { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.ClientHelloAlpnVariant> AlpnVariants { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.NamedGroup> SupportedGroups { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> SignatureAlgorithms { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsCipherSuite> CipherSuites { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsHpkeSymmetricCipherSuite> GreaseEchCipherSuites { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> GreaseEchPayloadLengths { get; set; }
+  P: public System.Int32 ApplicationSettingsProbabilityPercent { get; set; }
+  P: public System.Int32 GreaseEchProbabilityPercent { get; set; }
+  P: public System.Int32 GreaseProbabilityPercent { get; set; }
+  P: public System.Int32 MaximumKeyShareCount { get; set; }
+  P: public System.Int32 MaximumPaddingLength { get; set; }
+  P: public System.Int32 MinimumKeyShareCount { get; set; }
+  P: public System.Int32 MinimumPaddingLength { get; set; }
+  P: public System.Int32 PaddingProbabilityPercent { get; set; }
+T: public sealed class SharpTls.ClientHelloRollerOptions
+  C: public SharpTls.ClientHelloRollerOptions()
+  P: public SharpTls.ClientHelloRandomizationOptions Randomization { get; set; }
+  P: public System.Boolean IncludeRandomizedProfile { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.ClientHelloProfile> CandidateProfiles { get; set; }
+  P: public System.Int32 CacheCapacity { get; set; }
+  P: public System.Int32 MaximumAttempts { get; set; }
+  P: public System.TimeSpan InitialRetryDelay { get; set; }
+  P: public System.TimeSpan MaximumRetryDelay { get; set; }
+T: public sealed class SharpTls.ClientHelloSpec
+  P: public SharpTls.ClientHelloGreasePolicy? GreasePolicy { get; }
+  P: public SharpTls.Quic.TlsQuicTransportParameters? QuicTransportParameters { get; }
+  P: public SharpTls.TlsApplicationSettingsCodePoint? ApplicationSettingsCodePoint { get; }
+  P: public System.Boolean AllowsDuplicateSignatureAlgorithms { get; }
+  P: public System.Boolean AllowsUnsupportedDelegatedCredentialAlgorithmsForWireFidelity { get; }
+  P: public System.Boolean Grease { get; }
+  P: public System.Boolean GreaseEncryptedClientHello { get; }
+  P: public System.Boolean IncludeSni { get; }
+  P: public System.Boolean ShuffleExtensions { get; }
+  P: public System.Boolean SupportsEarlyData { get; }
+  P: public System.Boolean SupportsPostHandshakeAuthentication { get; }
+  P: public System.Boolean SupportsSessionResumption { get; }
+  P: public System.Boolean UseBoringPadding { get; }
+  P: public System.Byte[]? FixedGreaseKeyShareBody { get; }
+  P: public System.Byte[]? SecondaryGreaseExtensionBody { get; }
+  P: public System.Byte[]? SessionId { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.ClientHelloExtensionSpec> Extensions { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.NamedGroup> KeyShareGroups { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.NamedGroup> SupportedGroups { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> SignatureAlgorithms { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme>? CertificateSignatureAlgorithms { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme>? DelegatedCredentialSignatureAlgorithms { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsCipherSuite> CipherSuites { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsProtocolVersion> SupportedVersions { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsHpkeSymmetricCipherSuite> GreaseEchCipherSuites { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> GreaseEchPayloadLengths { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> AlpnProtocols { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> ApplicationSettingsProtocols { get; }
+  P: public System.Int32? PaddingLength { get; }
+  P: public System.Int32? RecordSizeLimit { get; }
+T: public static class SharpTls.ClientHelloSpecJson
+  M: public static SharpTls.ClientHelloSpec Deserialize(System.ReadOnlySpan<System.Byte> utf8Json, SharpTls.ClientHelloSpecJsonOptions? options = default)
+  M: public static SharpTls.ClientHelloSpec Deserialize(System.String json, SharpTls.ClientHelloSpecJsonOptions? options = default)
+  M: public static System.Byte[] SerializeUtf8(SharpTls.ClientHelloSpec spec, SharpTls.ClientHelloSpecJsonOptions? options = default)
+  M: public static System.String Serialize(SharpTls.ClientHelloSpec spec, SharpTls.ClientHelloSpecJsonOptions? options = default)
+T: public sealed class SharpTls.ClientHelloSpecJsonOptions
+  C: public SharpTls.ClientHelloSpecJsonOptions()
+  P: public System.Boolean WriteIndented { get; set; }
+  P: public System.Int32 MaximumDocumentSize { get; set; }
+T: public sealed class SharpTls.CustomTlsCertificateValidationOptions
+  C: public SharpTls.CustomTlsCertificateValidationOptions()
+  P: public SharpTls.Certificates.TlsServerCertificateEvidenceValidator? EvidenceValidator { get; set; }
+  P: public System.Boolean DisableCertificateDownloads { get; set; }
+  P: public System.Boolean RequireValidStapledOcspResponse { get; set; }
+  P: public System.Collections.Generic.IReadOnlyCollection<System.Security.Cryptography.X509Certificates.X509Certificate2>? CustomTrustRoots { get; set; }
+  P: public System.Int32 MinimumValidSignedCertificateTimestamps { get; set; }
+  P: public System.Security.Cryptography.X509Certificates.X509RevocationFlag RevocationFlag { get; set; }
+  P: public System.Security.Cryptography.X509Certificates.X509RevocationMode RevocationMode { get; set; }
+  P: public System.TimeSpan UrlRetrievalTimeout { get; set; }
+T: public sealed class SharpTls.CustomTlsClient : SharpTls.IApplicationDataTransport, System.IAsyncDisposable
+  C: public SharpTls.CustomTlsClient(SharpTls.CustomTlsClientOptions options)
+  M: public SharpTls.CustomTlsStream OpenApplicationStream(System.Boolean leaveClientOpen = false)
+  M: public SharpTls.TlsConnectionState GetConnectionState()
+  M: public System.Byte[] ExportKeyingMaterial(System.String label, System.ReadOnlySpan<System.Byte> context, System.Int32 outputLength)
+  M: public System.Threading.Tasks.ValueTask AuthenticateAsync(System.IO.Stream transport, System.String referenceIdentity, System.Boolean leaveOpen = false, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask CloseAsync(System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask ConnectAsync(System.String host, System.Int32 port, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Threading.Tasks.ValueTask RequestKeyUpdateAsync(System.Boolean requestPeerUpdate = false, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask WriteApplicationDataAsync(System.ReadOnlyMemory<System.Byte> data, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask<System.Byte[]?> ReadApplicationDataAsync(System.Threading.CancellationToken cancellationToken = default)
+  P: public SharpTls.Protocol.NamedGroup? NegotiatedGroup { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite? NegotiatedCipherSuite { get; }
+  P: public SharpTls.Protocol.TlsProtocolVersion? NegotiatedProtocolVersion { get; }
+  P: public SharpTls.Tls13EarlyDataStatus EarlyDataStatus { get; }
+  P: public SharpTls.TlsApplicationSettingsCodePoint? NegotiatedApplicationSettingsCodePoint { get; }
+  P: public System.Boolean EncryptedClientHelloAccepted { get; }
+  P: public System.Boolean ExternalPskWasSelected { get; }
+  P: public System.Boolean HandshakeUsedHelloRetryRequest { get; }
+  P: public System.Boolean IsConnected { get; }
+  P: public System.Boolean ServerUsedDelegatedCredential { get; }
+  P: public System.Boolean SessionWasResumed { get; }
+  P: public System.Byte[]? NegotiatedPeerApplicationSettings { get; }
+  P: public System.DateTimeOffset? ServerDelegatedCredentialExpiresAt { get; }
+  P: public System.Int32 PostHandshakeAuthenticationCount { get; }
+  P: public System.Int32? NegotiatedReceiveRecordSizeLimit { get; }
+  P: public System.Int32? NegotiatedSendRecordSizeLimit { get; }
+  P: public System.String? NegotiatedApplicationProtocol { get; }
+  P: public System.UInt64 ClientKeyUpdateCount { get; }
+  P: public System.UInt64 ServerKeyUpdateCount { get; }
+T: public sealed class SharpTls.CustomTlsClientOptions
+  C: public SharpTls.CustomTlsClientOptions()
+  P: public SharpTls.Certificates.TlsClientCertificate? ClientCertificate { get; set; }
+  P: public SharpTls.Certificates.TlsClientCertificateSelector? ClientCertificateSelector { get; set; }
+  P: public SharpTls.ClientHelloProfile ClientHello { get; set; }
+  P: public SharpTls.CustomTlsCertificateValidationOptions CertificateValidation { get; set; }
+  P: public SharpTls.Protocol.TlsLimits Limits { get; set; }
+  P: public SharpTls.Tls12SessionCache? Tls12SessionCache { get; set; }
+  P: public SharpTls.Tls13EarlyDataOptions? EarlyData { get; set; }
+  P: public SharpTls.Tls13ExternalPsk? ExternalPsk { get; set; }
+  P: public SharpTls.Tls13SessionCache? SessionCache { get; set; }
+  P: public SharpTls.TlsEchGreaseOptions? EncryptedClientHelloGrease { get; set; }
+  P: public SharpTls.TlsEchOptions? EncryptedClientHello { get; set; }
+  P: public SharpTls.TlsNssKeyLogSink? DangerousNssKeyLog { get; set; }
+  P: public SharpTls.TlsRecordFragmentation ApplicationDataFragmentation { get; set; }
+  P: public SharpTls.TlsRecordFragmentation HandshakeFragmentation { get; set; }
+  P: public System.Action<SharpTls.TlsClientHelloInspection>? ClientHelloInspector { get; set; }
+  P: public System.Action<SharpTls.TlsHandshakeEvent>? HandshakeEventObserver { get; set; }
+  P: public System.Boolean SendCompatibilityChangeCipherSpec { get; set; }
+  P: public System.Boolean TcpNoDelay { get; set; }
+  P: public System.Boolean UseInitialCompatibilityRecordVersion { get; set; }
+  P: public System.Collections.Generic.IReadOnlyDictionary<System.String, System.Byte[]>? ClientApplicationSettings { get; set; }
+  P: public System.Int32 ApplicationDataPaddingLength { get; set; }
+  P: public System.Int32 MaximumOfferedTls13PskIdentities { get; set; }
+  P: public System.String? ServerName { get; set; }
+T: public sealed class SharpTls.CustomTlsListener : System.IAsyncDisposable
+  C: public SharpTls.CustomTlsListener(System.Net.IPEndPoint localEndpoint, System.Func<SharpTls.CustomTlsServerOptions> optionsFactory)
+  C: public SharpTls.CustomTlsListener(System.Net.Sockets.TcpListener listener, System.Func<SharpTls.CustomTlsServerOptions> optionsFactory, System.Boolean leaveOpen = true)
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Threading.Tasks.ValueTask<SharpTls.CustomTlsServer> AcceptConnectionAsync(System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Void Start(System.Int32 backlog = 512)
+  P: public System.Net.EndPoint LocalEndpoint { get; }
+T: public sealed class SharpTls.CustomTlsServer : SharpTls.IApplicationDataTransport, System.IAsyncDisposable
+  C: public SharpTls.CustomTlsServer(SharpTls.CustomTlsServerOptions options)
+  M: public SharpTls.CustomTlsStream AsStream(System.Boolean leaveServerOpen = false)
+  M: public System.Byte[] ExportKeyingMaterial(System.String label, System.ReadOnlySpan<System.Byte> context, System.Int32 outputLength)
+  M: public System.Threading.Tasks.ValueTask AuthenticateAsync(System.IO.Stream transport, System.Boolean leaveOpen = false, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask AuthenticateAsync(System.Net.Sockets.Socket socket, System.Boolean ownsSocket = false, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Threading.Tasks.ValueTask IssueSessionTicketAsync(System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask RequestKeyUpdateAsync(System.Boolean requestPeerUpdate = false, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask WriteApplicationDataAsync(System.ReadOnlyMemory<System.Byte> data, System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask<System.Byte[]?> ReadApplicationDataAsync(System.Threading.CancellationToken cancellationToken = default)
+  P: public SharpTls.Protocol.NamedGroup? NegotiatedGroup { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite? NegotiatedCipherSuite { get; }
+  P: public SharpTls.Protocol.TlsProtocolVersion? NegotiatedProtocolVersion { get; }
+  P: public System.Boolean EncryptedClientHelloAccepted { get; }
+  P: public System.Boolean EncryptedClientHelloOffered { get; }
+  P: public System.Boolean IsAuthenticated { get; }
+  P: public System.Boolean SessionWasResumed { get; }
+  P: public System.Byte[]? TlsUnique { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> PeerCertificateChain { get; }
+  P: public System.Int32 IssuedSessionTicketCount { get; }
+  P: public System.String? EncryptedClientHelloOuterServerName { get; }
+  P: public System.String? NegotiatedApplicationProtocol { get; }
+  P: public System.String? ServerName { get; }
+  P: public System.UInt64 ClientKeyUpdateCount { get; }
+  P: public System.UInt64 ServerKeyUpdateCount { get; }
+T: public sealed class SharpTls.CustomTlsServerOptions
+  C: public SharpTls.CustomTlsServerOptions()
+  P: public SharpTls.Certificates.TlsServerCertificate? ServerCertificate { get; set; }
+  P: public SharpTls.CustomTlsCertificateValidationOptions ClientCertificateValidation { get; set; }
+  P: public SharpTls.Protocol.TlsLimits Limits { get; set; }
+  P: public SharpTls.Tls12ServerSessionCache? Tls12SessionCache { get; set; }
+  P: public SharpTls.Tls12ServerSessionTicketProtector? Tls12SessionTicketProtector { get; set; }
+  P: public SharpTls.Tls13ServerSessionTicketProtector? SessionTicketProtector { get; set; }
+  P: public SharpTls.TlsRecordFragmentation ApplicationDataFragmentation { get; set; }
+  P: public SharpTls.TlsRecordFragmentation HandshakeFragmentation { get; set; }
+  P: public SharpTls.TlsServerCertificateSelector? ServerCertificateSelector { get; set; }
+  P: public SharpTls.TlsServerClientAuthenticationMode ClientAuthentication { get; set; }
+  P: public System.Boolean RequireAlpn { get; set; }
+  P: public System.Boolean SendCompatibilityChangeCipherSpec { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.NamedGroup> SupportedGroups { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> ClientCertificateSignatureAlgorithms { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsCipherSuite> CipherSuites { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsCipherSuite> Tls12CipherSuites { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsProtocolVersion> SupportedVersions { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsCertificateCompressionAlgorithm> CertificateCompressionAlgorithms { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsEchServerKey> EncryptedClientHelloKeys { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> AlpnProtocols { get; set; }
+  P: public System.Int32 ApplicationDataPaddingLength { get; set; }
+  P: public System.Int32 AutomaticSessionTicketCount { get; set; }
+  P: public System.TimeSpan SessionTicketAgeTolerance { get; set; }
+  P: public System.TimeSpan SessionTicketLifetime { get; set; }
+  P: public System.TimeSpan Tls12SessionTicketLifetime { get; set; }
+T: public sealed class SharpTls.CustomTlsStream : System.IO.Stream, System.IAsyncDisposable, System.IDisposable
+  M: protected virtual System.Void Dispose(System.Boolean disposing)
+  M: public virtual System.Int32 Read(System.Byte[] buffer, System.Int32 offset, System.Int32 count)
+  M: public virtual System.Int64 Seek(System.Int64 offset, System.IO.SeekOrigin origin)
+  M: public virtual System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
+  M: public virtual System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public virtual System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<System.Byte> buffer, System.Threading.CancellationToken cancellationToken = default)
+  M: public virtual System.Threading.Tasks.ValueTask<System.Int32> ReadAsync(System.Memory<System.Byte> buffer, System.Threading.CancellationToken cancellationToken = default)
+  M: public virtual System.Void Flush()
+  M: public virtual System.Void SetLength(System.Int64 value)
+  M: public virtual System.Void Write(System.Byte[] buffer, System.Int32 offset, System.Int32 count)
+  P: public System.Boolean CanRead { get; }
+  P: public System.Boolean CanSeek { get; }
+  P: public System.Boolean CanWrite { get; }
+  P: public System.Int64 Length { get; }
+  P: public System.Int64 Position { get; set; }
+T: public enum SharpTls.Protocol.NamedGroup : System.UInt16
+  F: public const SharpTls.Protocol.NamedGroup Ffdhe2048 = SharpTls.Protocol.NamedGroup.Ffdhe2048
+  F: public const SharpTls.Protocol.NamedGroup Ffdhe3072 = SharpTls.Protocol.NamedGroup.Ffdhe3072
+  F: public const SharpTls.Protocol.NamedGroup Secp256r1 = SharpTls.Protocol.NamedGroup.Secp256r1
+  F: public const SharpTls.Protocol.NamedGroup Secp384r1 = SharpTls.Protocol.NamedGroup.Secp384r1
+  F: public const SharpTls.Protocol.NamedGroup Secp521r1 = SharpTls.Protocol.NamedGroup.Secp521r1
+  F: public const SharpTls.Protocol.NamedGroup X25519 = SharpTls.Protocol.NamedGroup.X25519
+  F: public const SharpTls.Protocol.NamedGroup X25519Kyber768Draft00 = SharpTls.Protocol.NamedGroup.X25519Kyber768Draft00
+  F: public const SharpTls.Protocol.NamedGroup X25519MlKem768 = SharpTls.Protocol.NamedGroup.X25519MlKem768
+T: public enum SharpTls.Protocol.SignatureScheme : System.UInt16
+  F: public const SharpTls.Protocol.SignatureScheme DsaSha1 = SharpTls.Protocol.SignatureScheme.DsaSha1
+  F: public const SharpTls.Protocol.SignatureScheme DsaSha256 = SharpTls.Protocol.SignatureScheme.DsaSha256
+  F: public const SharpTls.Protocol.SignatureScheme EcdsaSecp256r1Sha256 = SharpTls.Protocol.SignatureScheme.EcdsaSecp256r1Sha256
+  F: public const SharpTls.Protocol.SignatureScheme EcdsaSecp384r1Sha384 = SharpTls.Protocol.SignatureScheme.EcdsaSecp384r1Sha384
+  F: public const SharpTls.Protocol.SignatureScheme EcdsaSecp521r1Sha512 = SharpTls.Protocol.SignatureScheme.EcdsaSecp521r1Sha512
+  F: public const SharpTls.Protocol.SignatureScheme EcdsaSha1 = SharpTls.Protocol.SignatureScheme.EcdsaSha1
+  F: public const SharpTls.Protocol.SignatureScheme RsaPkcs1Sha1 = SharpTls.Protocol.SignatureScheme.RsaPkcs1Sha1
+  F: public const SharpTls.Protocol.SignatureScheme RsaPkcs1Sha256 = SharpTls.Protocol.SignatureScheme.RsaPkcs1Sha256
+  F: public const SharpTls.Protocol.SignatureScheme RsaPkcs1Sha384 = SharpTls.Protocol.SignatureScheme.RsaPkcs1Sha384
+  F: public const SharpTls.Protocol.SignatureScheme RsaPkcs1Sha512 = SharpTls.Protocol.SignatureScheme.RsaPkcs1Sha512
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssPssSha256 = SharpTls.Protocol.SignatureScheme.RsaPssPssSha256
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssPssSha384 = SharpTls.Protocol.SignatureScheme.RsaPssPssSha384
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssPssSha512 = SharpTls.Protocol.SignatureScheme.RsaPssPssSha512
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssRsaeSha256 = SharpTls.Protocol.SignatureScheme.RsaPssRsaeSha256
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssRsaeSha384 = SharpTls.Protocol.SignatureScheme.RsaPssRsaeSha384
+  F: public const SharpTls.Protocol.SignatureScheme RsaPssRsaeSha512 = SharpTls.Protocol.SignatureScheme.RsaPssRsaeSha512
+T: public enum SharpTls.Protocol.TlsAlertDescription : System.Byte
+  F: public const SharpTls.Protocol.TlsAlertDescription BadCertificate = SharpTls.Protocol.TlsAlertDescription.BadCertificate
+  F: public const SharpTls.Protocol.TlsAlertDescription BadCertificateStatusResponse = SharpTls.Protocol.TlsAlertDescription.BadCertificateStatusResponse
+  F: public const SharpTls.Protocol.TlsAlertDescription BadRecordMac = SharpTls.Protocol.TlsAlertDescription.BadRecordMac
+  F: public const SharpTls.Protocol.TlsAlertDescription CertificateExpired = SharpTls.Protocol.TlsAlertDescription.CertificateExpired
+  F: public const SharpTls.Protocol.TlsAlertDescription CertificateRequired = SharpTls.Protocol.TlsAlertDescription.CertificateRequired
+  F: public const SharpTls.Protocol.TlsAlertDescription CertificateRevoked = SharpTls.Protocol.TlsAlertDescription.CertificateRevoked
+  F: public const SharpTls.Protocol.TlsAlertDescription CertificateUnknown = SharpTls.Protocol.TlsAlertDescription.CertificateUnknown
+  F: public const SharpTls.Protocol.TlsAlertDescription CloseNotify = SharpTls.Protocol.TlsAlertDescription.CloseNotify
+  F: public const SharpTls.Protocol.TlsAlertDescription DecodeError = SharpTls.Protocol.TlsAlertDescription.DecodeError
+  F: public const SharpTls.Protocol.TlsAlertDescription DecryptError = SharpTls.Protocol.TlsAlertDescription.DecryptError
+  F: public const SharpTls.Protocol.TlsAlertDescription EchRequired = SharpTls.Protocol.TlsAlertDescription.EchRequired
+  F: public const SharpTls.Protocol.TlsAlertDescription GeneralError = SharpTls.Protocol.TlsAlertDescription.GeneralError
+  F: public const SharpTls.Protocol.TlsAlertDescription HandshakeFailure = SharpTls.Protocol.TlsAlertDescription.HandshakeFailure
+  F: public const SharpTls.Protocol.TlsAlertDescription IllegalParameter = SharpTls.Protocol.TlsAlertDescription.IllegalParameter
+  F: public const SharpTls.Protocol.TlsAlertDescription InternalError = SharpTls.Protocol.TlsAlertDescription.InternalError
+  F: public const SharpTls.Protocol.TlsAlertDescription MissingExtension = SharpTls.Protocol.TlsAlertDescription.MissingExtension
+  F: public const SharpTls.Protocol.TlsAlertDescription NoApplicationProtocol = SharpTls.Protocol.TlsAlertDescription.NoApplicationProtocol
+  F: public const SharpTls.Protocol.TlsAlertDescription ProtocolVersion = SharpTls.Protocol.TlsAlertDescription.ProtocolVersion
+  F: public const SharpTls.Protocol.TlsAlertDescription RecordOverflow = SharpTls.Protocol.TlsAlertDescription.RecordOverflow
+  F: public const SharpTls.Protocol.TlsAlertDescription UnexpectedMessage = SharpTls.Protocol.TlsAlertDescription.UnexpectedMessage
+  F: public const SharpTls.Protocol.TlsAlertDescription UnknownCa = SharpTls.Protocol.TlsAlertDescription.UnknownCa
+  F: public const SharpTls.Protocol.TlsAlertDescription UnrecognizedName = SharpTls.Protocol.TlsAlertDescription.UnrecognizedName
+  F: public const SharpTls.Protocol.TlsAlertDescription UnsupportedCertificate = SharpTls.Protocol.TlsAlertDescription.UnsupportedCertificate
+  F: public const SharpTls.Protocol.TlsAlertDescription UnsupportedExtension = SharpTls.Protocol.TlsAlertDescription.UnsupportedExtension
+T: public enum SharpTls.Protocol.TlsCipherSuite : System.UInt16
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsAes128GcmSha256 = SharpTls.Protocol.TlsCipherSuite.TlsAes128GcmSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsAes256GcmSha384 = SharpTls.Protocol.TlsCipherSuite.TlsAes256GcmSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsChaCha20Poly1305Sha256 = SharpTls.Protocol.TlsCipherSuite.TlsChaCha20Poly1305Sha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsDheDssWithAes128CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsDheDssWithAes128CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsDheRsaWithAes128CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsDheRsaWithAes128CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsDheRsaWithAes128CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsDheRsaWithAes128CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsDheRsaWithAes256CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsDheRsaWithAes256CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsDheRsaWithAes256CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsDheRsaWithAes256CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWith3DesEdeCbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWith3DesEdeCbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes128CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes128CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes128CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes128CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes128GcmSha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes128GcmSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes256CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes256CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes256CbcSha384 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes256CbcSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithAes256GcmSha384 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithAes256GcmSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithChaCha20Poly1305Sha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithChaCha20Poly1305Sha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheEcdsaWithRc4_128Sha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheEcdsaWithRc4_128Sha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWith3DesEdeCbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWith3DesEdeCbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes128CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes128CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes128CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes128CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes128GcmSha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes256CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes256CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes256CbcSha384 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes256CbcSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithAes256GcmSha384 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithAes256GcmSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithChaCha20Poly1305Sha256 = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithChaCha20Poly1305Sha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsEcdheRsaWithRc4_128Sha = SharpTls.Protocol.TlsCipherSuite.TlsEcdheRsaWithRc4_128Sha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWith3DesEdeCbcSha = SharpTls.Protocol.TlsCipherSuite.TlsRsaWith3DesEdeCbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes128CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes128CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes128CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes128CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes128GcmSha256 = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes128GcmSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes256CbcSha = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes256CbcSha
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes256CbcSha256 = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes256CbcSha256
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithAes256GcmSha384 = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithAes256GcmSha384
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithRc4_128Md5 = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithRc4_128Md5
+  F: public const SharpTls.Protocol.TlsCipherSuite TlsRsaWithRc4_128Sha = SharpTls.Protocol.TlsCipherSuite.TlsRsaWithRc4_128Sha
+T: public enum SharpTls.Protocol.TlsExtensionType : System.UInt16
+  F: public const SharpTls.Protocol.TlsExtensionType ApplicationLayerProtocolNegotiation = SharpTls.Protocol.TlsExtensionType.ApplicationLayerProtocolNegotiation
+  F: public const SharpTls.Protocol.TlsExtensionType CompressCertificate = SharpTls.Protocol.TlsExtensionType.CompressCertificate
+  F: public const SharpTls.Protocol.TlsExtensionType Cookie = SharpTls.Protocol.TlsExtensionType.Cookie
+  F: public const SharpTls.Protocol.TlsExtensionType DelegatedCredential = SharpTls.Protocol.TlsExtensionType.DelegatedCredential
+  F: public const SharpTls.Protocol.TlsExtensionType EarlyData = SharpTls.Protocol.TlsExtensionType.EarlyData
+  F: public const SharpTls.Protocol.TlsExtensionType EcPointFormats = SharpTls.Protocol.TlsExtensionType.EcPointFormats
+  F: public const SharpTls.Protocol.TlsExtensionType EchOuterExtensions = SharpTls.Protocol.TlsExtensionType.EchOuterExtensions
+  F: public const SharpTls.Protocol.TlsExtensionType EncryptedClientHello = SharpTls.Protocol.TlsExtensionType.EncryptedClientHello
+  F: public const SharpTls.Protocol.TlsExtensionType ExtendedMasterSecret = SharpTls.Protocol.TlsExtensionType.ExtendedMasterSecret
+  F: public const SharpTls.Protocol.TlsExtensionType KeyShare = SharpTls.Protocol.TlsExtensionType.KeyShare
+  F: public const SharpTls.Protocol.TlsExtensionType MaximumFragmentLength = SharpTls.Protocol.TlsExtensionType.MaximumFragmentLength
+  F: public const SharpTls.Protocol.TlsExtensionType Padding = SharpTls.Protocol.TlsExtensionType.Padding
+  F: public const SharpTls.Protocol.TlsExtensionType PostHandshakeAuthentication = SharpTls.Protocol.TlsExtensionType.PostHandshakeAuthentication
+  F: public const SharpTls.Protocol.TlsExtensionType PreSharedKey = SharpTls.Protocol.TlsExtensionType.PreSharedKey
+  F: public const SharpTls.Protocol.TlsExtensionType PskKeyExchangeModes = SharpTls.Protocol.TlsExtensionType.PskKeyExchangeModes
+  F: public const SharpTls.Protocol.TlsExtensionType QuicTransportParameters = SharpTls.Protocol.TlsExtensionType.QuicTransportParameters
+  F: public const SharpTls.Protocol.TlsExtensionType RecordSizeLimit = SharpTls.Protocol.TlsExtensionType.RecordSizeLimit
+  F: public const SharpTls.Protocol.TlsExtensionType RenegotiationInfo = SharpTls.Protocol.TlsExtensionType.RenegotiationInfo
+  F: public const SharpTls.Protocol.TlsExtensionType ServerName = SharpTls.Protocol.TlsExtensionType.ServerName
+  F: public const SharpTls.Protocol.TlsExtensionType SessionTicket = SharpTls.Protocol.TlsExtensionType.SessionTicket
+  F: public const SharpTls.Protocol.TlsExtensionType SignatureAlgorithms = SharpTls.Protocol.TlsExtensionType.SignatureAlgorithms
+  F: public const SharpTls.Protocol.TlsExtensionType SignatureAlgorithmsCert = SharpTls.Protocol.TlsExtensionType.SignatureAlgorithmsCert
+  F: public const SharpTls.Protocol.TlsExtensionType SignedCertificateTimestamp = SharpTls.Protocol.TlsExtensionType.SignedCertificateTimestamp
+  F: public const SharpTls.Protocol.TlsExtensionType StatusRequest = SharpTls.Protocol.TlsExtensionType.StatusRequest
+  F: public const SharpTls.Protocol.TlsExtensionType SupportedGroups = SharpTls.Protocol.TlsExtensionType.SupportedGroups
+  F: public const SharpTls.Protocol.TlsExtensionType SupportedVersions = SharpTls.Protocol.TlsExtensionType.SupportedVersions
+T: public sealed class SharpTls.Protocol.TlsLimits : System.IEquatable<SharpTls.Protocol.TlsLimits>
+  C: public SharpTls.Protocol.TlsLimits()
+  P: public SharpTls.Protocol.TlsLimits Default { get; }
+  P: public System.Int32 MaxCertificateCount { get; init; }
+  P: public System.Int32 MaxCertificateListSize { get; init; }
+  P: public System.Int32 MaxEarlyDataSize { get; init; }
+  P: public System.Int32 MaxHandshakeMessageSize { get; init; }
+  P: public System.Int32 MaxHandshakeTranscriptSize { get; init; }
+  P: public System.Int32 MaxPostHandshakeAuthenticationRequests { get; init; }
+  P: public System.Int32 MaxSessionTicketsPerConnection { get; init; }
+T: public sealed class SharpTls.Protocol.TlsProtocolException : System.IO.IOException, System.Runtime.Serialization.ISerializable
+  C: public SharpTls.Protocol.TlsProtocolException(SharpTls.Protocol.TlsAlertDescription alert, System.String message)
+  C: public SharpTls.Protocol.TlsProtocolException(SharpTls.Protocol.TlsAlertDescription alert, System.String message, System.Exception innerException)
+  P: public SharpTls.Protocol.TlsAlertDescription Alert { get; }
+T: public enum SharpTls.Protocol.TlsProtocolVersion : System.UInt16
+  F: public const SharpTls.Protocol.TlsProtocolVersion Tls10 = SharpTls.Protocol.TlsProtocolVersion.Tls10
+  F: public const SharpTls.Protocol.TlsProtocolVersion Tls11 = SharpTls.Protocol.TlsProtocolVersion.Tls11
+  F: public const SharpTls.Protocol.TlsProtocolVersion Tls12 = SharpTls.Protocol.TlsProtocolVersion.Tls12
+  F: public const SharpTls.Protocol.TlsProtocolVersion Tls13 = SharpTls.Protocol.TlsProtocolVersion.Tls13
+T: public sealed class SharpTls.Quic.CustomTlsQuicClient : System.IAsyncDisposable
+  C: public SharpTls.Quic.CustomTlsQuicClient(SharpTls.Quic.CustomTlsQuicClientOptions options)
+  M: public SharpTls.Quic.TlsQuicProcessResult ConfirmHandshake()
+  M: public SharpTls.Quic.TlsQuicProcessResult NotifyHandshakePacketSent()
+  M: public SharpTls.Quic.TlsQuicProcessResult StartHandshake()
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Threading.Tasks.ValueTask<SharpTls.Quic.TlsQuicProcessResult> ProcessCryptoDataAsync(SharpTls.Quic.TlsQuicEncryptionLevel level, System.UInt64 offset, System.ReadOnlyMemory<System.Byte> data, System.Threading.CancellationToken cancellationToken = default)
+  P: public SharpTls.Protocol.NamedGroup? NegotiatedGroup { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite? NegotiatedCipherSuite { get; }
+  P: public SharpTls.Tls13EarlyDataStatus EarlyDataStatus { get; }
+  P: public System.Boolean EncryptedClientHelloAccepted { get; }
+  P: public System.Boolean HandshakeUsedHelloRetryRequest { get; }
+  P: public System.Boolean IsHandshakeComplete { get; }
+  P: public System.Boolean SessionWasResumed { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> PeerCertificateChain { get; }
+  P: public System.String? NegotiatedApplicationProtocol { get; }
+T: public sealed class SharpTls.Quic.CustomTlsQuicClientOptions
+  C: public SharpTls.Quic.CustomTlsQuicClientOptions()
+  P: public SharpTls.Certificates.TlsClientCertificate? ClientCertificate { get; set; }
+  P: public SharpTls.Certificates.TlsClientCertificateSelector? ClientCertificateSelector { get; set; }
+  P: public SharpTls.ClientHelloProfile ClientHello { get; set; }
+  P: public SharpTls.CustomTlsCertificateValidationOptions CertificateValidation { get; set; }
+  P: public SharpTls.Protocol.TlsLimits Limits { get; set; }
+  P: public SharpTls.Quic.TlsQuicEarlyDataOptions? EarlyData { get; set; }
+  P: public SharpTls.Tls13SessionCache? SessionCache { get; set; }
+  P: public SharpTls.TlsEchGreaseOptions? EncryptedClientHelloGrease { get; set; }
+  P: public SharpTls.TlsEchOptions? EncryptedClientHello { get; set; }
+  P: public System.Int32 MaximumCryptoStreamLength { get; set; }
+  P: public System.Int32 ServerPort { get; set; }
+  P: public System.String ServerName { get; set; }
+T: public sealed class SharpTls.Quic.CustomTlsQuicServer : System.IAsyncDisposable
+  C: public SharpTls.Quic.CustomTlsQuicServer(SharpTls.Quic.CustomTlsQuicServerOptions options)
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Threading.Tasks.ValueTask<SharpTls.Quic.TlsQuicProcessResult> IssueSessionTicketAsync(System.Threading.CancellationToken cancellationToken = default)
+  M: public System.Threading.Tasks.ValueTask<SharpTls.Quic.TlsQuicProcessResult> ProcessCryptoDataAsync(SharpTls.Quic.TlsQuicEncryptionLevel level, System.UInt64 offset, System.ReadOnlyMemory<System.Byte> data, System.Threading.CancellationToken cancellationToken = default)
+  P: public SharpTls.Protocol.NamedGroup? NegotiatedGroup { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite? NegotiatedCipherSuite { get; }
+  P: public System.Boolean EarlyDataAccepted { get; }
+  P: public System.Boolean EncryptedClientHelloAccepted { get; }
+  P: public System.Boolean EncryptedClientHelloOffered { get; }
+  P: public System.Boolean HandshakeUsedHelloRetryRequest { get; }
+  P: public System.Boolean IsHandshakeComplete { get; }
+  P: public System.Boolean SessionWasResumed { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> PeerCertificateChain { get; }
+  P: public System.Int32 IssuedSessionTicketCount { get; }
+  P: public System.String? EncryptedClientHelloOuterServerName { get; }
+  P: public System.String? NegotiatedApplicationProtocol { get; }
+  P: public System.String? ServerName { get; }
+T: public sealed class SharpTls.Quic.CustomTlsQuicServerOptions
+  C: public SharpTls.Quic.CustomTlsQuicServerOptions()
+  P: public SharpTls.CustomTlsServerOptions Tls { get; set; }
+  P: public SharpTls.Quic.TlsQuicEarlyDataReplayValidator? EarlyDataReplayValidator { get; set; }
+  P: public SharpTls.Quic.TlsQuicTransportParameters? TransportParameters { get; set; }
+  P: public System.Boolean EnableEarlyData { get; set; }
+  P: public System.Int32 MaximumCryptoStreamLength { get; set; }
+T: public sealed class SharpTls.Quic.TlsQuicCryptoDataEvent : SharpTls.Quic.TlsQuicEvent
+  P: public SharpTls.Quic.TlsQuicEncryptionLevel Level { get; }
+  P: public System.Byte[] Data { get; }
+  P: public System.UInt64 Offset { get; }
+T: public sealed class SharpTls.Quic.TlsQuicDiscardKeysEvent : SharpTls.Quic.TlsQuicEvent
+  P: public SharpTls.Quic.TlsQuicEncryptionLevel Level { get; }
+T: public sealed class SharpTls.Quic.TlsQuicEarlyDataContext
+  P: public System.Byte[] TicketIdentity { get; }
+  P: public System.String NegotiatedAlpn { get; }
+  P: public System.String? ServerName { get; }
+T: public sealed class SharpTls.Quic.TlsQuicEarlyDataOptions
+  C: public SharpTls.Quic.TlsQuicEarlyDataOptions(System.Boolean acknowledgeReplayRisk)
+T: public sealed class SharpTls.Quic.TlsQuicEarlyDataReadyEvent : SharpTls.Quic.TlsQuicEvent
+  P: public SharpTls.Quic.TlsQuicTransportParameters RememberedServerTransportParameters { get; }
+T: public delegate System.Threading.Tasks.ValueTask<System.Boolean> SharpTls.Quic.TlsQuicEarlyDataReplayValidator(SharpTls.Quic.TlsQuicEarlyDataContext context, System.Threading.CancellationToken cancellationToken)
+T: public enum SharpTls.Quic.TlsQuicEncryptionLevel : System.Int32
+  F: public const SharpTls.Quic.TlsQuicEncryptionLevel Application = SharpTls.Quic.TlsQuicEncryptionLevel.Application
+  F: public const SharpTls.Quic.TlsQuicEncryptionLevel EarlyData = SharpTls.Quic.TlsQuicEncryptionLevel.EarlyData
+  F: public const SharpTls.Quic.TlsQuicEncryptionLevel Handshake = SharpTls.Quic.TlsQuicEncryptionLevel.Handshake
+  F: public const SharpTls.Quic.TlsQuicEncryptionLevel Initial = SharpTls.Quic.TlsQuicEncryptionLevel.Initial
+T: public enum SharpTls.Quic.TlsQuicEndpointRole : System.Int32
+  F: public const SharpTls.Quic.TlsQuicEndpointRole Client = SharpTls.Quic.TlsQuicEndpointRole.Client
+  F: public const SharpTls.Quic.TlsQuicEndpointRole Server = SharpTls.Quic.TlsQuicEndpointRole.Server
+T: public abstract class SharpTls.Quic.TlsQuicEvent
+T: public sealed class SharpTls.Quic.TlsQuicHandshakeCompletedEvent : SharpTls.Quic.TlsQuicEvent
+  P: public SharpTls.Protocol.NamedGroup Group { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite CipherSuite { get; }
+  P: public System.String NegotiatedAlpn { get; }
+T: public sealed class SharpTls.Quic.TlsQuicInitialSecrets : System.IDisposable
+  M: public SharpTls.Quic.TlsQuicPacketProtectionKeys DeriveClientPacketProtectionKeys(SharpTls.Quic.TlsQuicVersion version)
+  M: public SharpTls.Quic.TlsQuicPacketProtectionKeys DeriveServerPacketProtectionKeys(SharpTls.Quic.TlsQuicVersion version)
+  M: public System.Byte[] CopyClientSecret()
+  M: public System.Byte[] CopyServerSecret()
+  M: public System.Void Dispose()
+  M: public static SharpTls.Quic.TlsQuicInitialSecrets Derive(SharpTls.Quic.TlsQuicVersion version, System.ReadOnlySpan<System.Byte> destinationConnectionId)
+T: public sealed class SharpTls.Quic.TlsQuicPacketProtectionKeys : System.IDisposable
+  M: public System.Byte[] CopyHeaderProtectionKey()
+  M: public System.Byte[] CopyIv()
+  M: public System.Byte[] CopyKey()
+  M: public System.Void Dispose()
+T: public sealed class SharpTls.Quic.TlsQuicPeerTransportParametersEvent : SharpTls.Quic.TlsQuicEvent
+  P: public SharpTls.Quic.TlsQuicTransportParameters Parameters { get; }
+T: public sealed class SharpTls.Quic.TlsQuicProcessResult : System.IDisposable
+  M: public System.Void Dispose()
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Quic.TlsQuicEvent> Events { get; }
+T: public enum SharpTls.Quic.TlsQuicSecretDirection : System.Int32
+  F: public const SharpTls.Quic.TlsQuicSecretDirection Read = SharpTls.Quic.TlsQuicSecretDirection.Read
+  F: public const SharpTls.Quic.TlsQuicSecretDirection Write = SharpTls.Quic.TlsQuicSecretDirection.Write
+T: public sealed class SharpTls.Quic.TlsQuicTrafficSecret : System.IDisposable
+  M: public SharpTls.Quic.TlsQuicPacketProtectionKeys DerivePacketProtectionKeys(SharpTls.Quic.TlsQuicVersion version)
+  M: public System.Byte[] CopySecret()
+  M: public System.Void Dispose()
+  P: public SharpTls.Protocol.TlsCipherSuite CipherSuite { get; }
+  P: public SharpTls.Quic.TlsQuicEncryptionLevel Level { get; }
+  P: public SharpTls.Quic.TlsQuicSecretDirection Direction { get; }
+T: public sealed class SharpTls.Quic.TlsQuicTrafficSecretEvent : SharpTls.Quic.TlsQuicEvent, System.IDisposable
+  M: public System.Void Dispose()
+  P: public SharpTls.Quic.TlsQuicTrafficSecret Secret { get; }
+T: public enum SharpTls.Quic.TlsQuicTransportError : System.UInt64
+  F: public const SharpTls.Quic.TlsQuicTransportError CryptoBufferExceeded = SharpTls.Quic.TlsQuicTransportError.CryptoBufferExceeded
+  F: public const SharpTls.Quic.TlsQuicTransportError ProtocolViolation = SharpTls.Quic.TlsQuicTransportError.ProtocolViolation
+  F: public const SharpTls.Quic.TlsQuicTransportError TransportParameterError = SharpTls.Quic.TlsQuicTransportError.TransportParameterError
+T: public sealed class SharpTls.Quic.TlsQuicTransportException : System.IO.IOException, System.Runtime.Serialization.ISerializable
+  C: public SharpTls.Quic.TlsQuicTransportException(SharpTls.Quic.TlsQuicTransportError error, System.String message)
+  M: public static System.UInt64 GetCryptoErrorCode(SharpTls.Protocol.TlsAlertDescription alert)
+  P: public SharpTls.Quic.TlsQuicTransportError Error { get; }
+T: public sealed class SharpTls.Quic.TlsQuicTransportParameter
+  C: public SharpTls.Quic.TlsQuicTransportParameter(System.UInt64 id, System.ReadOnlySpan<System.Byte> value)
+  M: public System.UInt64 GetVariableInteger()
+  M: public static SharpTls.Quic.TlsQuicTransportParameter Empty(SharpTls.Quic.TlsQuicTransportParameterId id)
+  M: public static SharpTls.Quic.TlsQuicTransportParameter VariableInteger(SharpTls.Quic.TlsQuicTransportParameterId id, System.UInt64 value)
+  P: public System.Byte[] Value { get; }
+  P: public System.UInt64 Id { get; }
+T: public enum SharpTls.Quic.TlsQuicTransportParameterId : System.UInt64
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId AckDelayExponent = SharpTls.Quic.TlsQuicTransportParameterId.AckDelayExponent
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId ActiveConnectionIdLimit = SharpTls.Quic.TlsQuicTransportParameterId.ActiveConnectionIdLimit
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId DisableActiveMigration = SharpTls.Quic.TlsQuicTransportParameterId.DisableActiveMigration
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId GreaseQuicBit = SharpTls.Quic.TlsQuicTransportParameterId.GreaseQuicBit
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxData = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxData
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxStreamDataBidiLocal = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxStreamDataBidiLocal
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxStreamDataBidiRemote = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxStreamDataBidiRemote
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxStreamDataUni = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxStreamDataUni
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxStreamsBidi = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxStreamsBidi
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialMaxStreamsUni = SharpTls.Quic.TlsQuicTransportParameterId.InitialMaxStreamsUni
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId InitialSourceConnectionId = SharpTls.Quic.TlsQuicTransportParameterId.InitialSourceConnectionId
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId MaxAckDelay = SharpTls.Quic.TlsQuicTransportParameterId.MaxAckDelay
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId MaxDatagramFrameSize = SharpTls.Quic.TlsQuicTransportParameterId.MaxDatagramFrameSize
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId MaxIdleTimeout = SharpTls.Quic.TlsQuicTransportParameterId.MaxIdleTimeout
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId MaxUdpPayloadSize = SharpTls.Quic.TlsQuicTransportParameterId.MaxUdpPayloadSize
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId OriginalDestinationConnectionId = SharpTls.Quic.TlsQuicTransportParameterId.OriginalDestinationConnectionId
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId PreferredAddress = SharpTls.Quic.TlsQuicTransportParameterId.PreferredAddress
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId RetrySourceConnectionId = SharpTls.Quic.TlsQuicTransportParameterId.RetrySourceConnectionId
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId StatelessResetToken = SharpTls.Quic.TlsQuicTransportParameterId.StatelessResetToken
+  F: public const SharpTls.Quic.TlsQuicTransportParameterId VersionInformation = SharpTls.Quic.TlsQuicTransportParameterId.VersionInformation
+T: public sealed class SharpTls.Quic.TlsQuicTransportParameters
+  C: public SharpTls.Quic.TlsQuicTransportParameters(System.Collections.Generic.IEnumerable<SharpTls.Quic.TlsQuicTransportParameter> parameters)
+  M: public SharpTls.Quic.TlsQuicTransportParameter? Get(System.UInt64 id)
+  M: public System.Byte[] Encode()
+  M: public System.Void ValidatePeer(SharpTls.Quic.TlsQuicEndpointRole senderRole)
+  M: public static SharpTls.Quic.TlsQuicTransportParameters Parse(System.ReadOnlySpan<System.Byte> encoded)
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Quic.TlsQuicTransportParameter> Parameters { get; }
+T: public enum SharpTls.Quic.TlsQuicVersion : System.UInt32
+  F: public const SharpTls.Quic.TlsQuicVersion Version1 = SharpTls.Quic.TlsQuicVersion.Version1
+  F: public const SharpTls.Quic.TlsQuicVersion Version2 = SharpTls.Quic.TlsQuicVersion.Version2
+T: public sealed class SharpTls.Tls12ServerSessionCache : System.IDisposable
+  C: public SharpTls.Tls12ServerSessionCache(System.Int32 capacity = 1024, System.TimeSpan? lifetime = default)
+  M: public System.Void Clear()
+  M: public System.Void Dispose()
+  P: public System.Int32 Count { get; }
+T: public sealed class SharpTls.Tls12ServerSessionTicketProtector : System.IDisposable
+  C: public SharpTls.Tls12ServerSessionTicketProtector(System.String currentKeyId, System.ReadOnlySpan<System.Byte> currentKey)
+  M: public System.Boolean RemoveDecryptionKey(System.String keyId)
+  M: public System.Void AddDecryptionKey(System.String keyId, System.ReadOnlySpan<System.Byte> key)
+  M: public System.Void Dispose()
+  P: public System.String CurrentKeyId { get; }
+T: public sealed class SharpTls.Tls12SessionCache : System.IDisposable
+  C: public SharpTls.Tls12SessionCache(System.Int32 capacity = 64, System.TimeSpan? maximumAuthenticationAge = default)
+  M: public System.Void Clear()
+  M: public System.Void Dispose()
+  P: public System.Int32 Count { get; }
+T: public sealed class SharpTls.Tls13EarlyDataOptions
+  C: public SharpTls.Tls13EarlyDataOptions(System.ReadOnlySpan<System.Byte> data, System.Boolean acknowledgeReplayRisk, SharpTls.Tls13EarlyDataRejectionPolicy rejectionPolicy = SharpTls.Tls13EarlyDataRejectionPolicy.ReturnToCaller)
+  P: public SharpTls.Tls13EarlyDataRejectionPolicy RejectionPolicy { get; }
+  P: public System.Byte[] Data { get; }
+T: public enum SharpTls.Tls13EarlyDataRejectionPolicy : System.Int32
+  F: public const SharpTls.Tls13EarlyDataRejectionPolicy RetransmitAfterHandshake = SharpTls.Tls13EarlyDataRejectionPolicy.RetransmitAfterHandshake
+  F: public const SharpTls.Tls13EarlyDataRejectionPolicy ReturnToCaller = SharpTls.Tls13EarlyDataRejectionPolicy.ReturnToCaller
+T: public enum SharpTls.Tls13EarlyDataStatus : System.Int32
+  F: public const SharpTls.Tls13EarlyDataStatus Accepted = SharpTls.Tls13EarlyDataStatus.Accepted
+  F: public const SharpTls.Tls13EarlyDataStatus NotConfigured = SharpTls.Tls13EarlyDataStatus.NotConfigured
+  F: public const SharpTls.Tls13EarlyDataStatus Rejected = SharpTls.Tls13EarlyDataStatus.Rejected
+  F: public const SharpTls.Tls13EarlyDataStatus RejectedAndRetransmitted = SharpTls.Tls13EarlyDataStatus.RejectedAndRetransmitted
+  F: public const SharpTls.Tls13EarlyDataStatus Unavailable = SharpTls.Tls13EarlyDataStatus.Unavailable
+T: public sealed class SharpTls.Tls13ExternalPsk : System.IDisposable
+  C: public SharpTls.Tls13ExternalPsk(System.Byte[] identity, System.Byte[] key, SharpTls.Protocol.TlsCipherSuite cipherSuite = SharpTls.Protocol.TlsCipherSuite.TlsAes128GcmSha256, System.Boolean requireSelection = true)
+  M: public System.Void Dispose()
+  P: public SharpTls.Protocol.TlsCipherSuite CipherSuite { get; }
+  P: public System.Boolean RequireSelection { get; }
+  P: public System.Byte[] Identity { get; }
+T: public sealed class SharpTls.Tls13ServerSessionTicketProtector : System.IDisposable
+  C: public SharpTls.Tls13ServerSessionTicketProtector(System.String currentKeyId, System.ReadOnlySpan<System.Byte> currentKey)
+  M: public System.Boolean RemoveDecryptionKey(System.String keyId)
+  M: public System.Void AddDecryptionKey(System.String keyId, System.ReadOnlySpan<System.Byte> key)
+  M: public System.Void Dispose()
+  P: public System.String CurrentKeyId { get; }
+T: public sealed class SharpTls.Tls13SessionCache : System.IDisposable
+  C: public SharpTls.Tls13SessionCache(System.Int32 capacity = 64, System.Int32 maximumTicketsPerOrigin = 4, System.TimeSpan? maximumAuthenticationAge = default)
+  M: public System.Byte[] ExportEncrypted(SharpTls.Tls13SessionStateProtector protector)
+  M: public System.Void Clear()
+  M: public System.Void Dispose()
+  M: public System.Void ImportEncrypted(System.ReadOnlySpan<System.Byte> protectedState, SharpTls.Tls13SessionStateProtector protector)
+  P: public System.Int32 Count { get; }
+T: public sealed class SharpTls.Tls13SessionStateProtector : System.IDisposable
+  C: public SharpTls.Tls13SessionStateProtector(System.String currentKeyId, System.ReadOnlySpan<System.Byte> currentKey, System.Int32 maximumProtectedStateSize = 16777216)
+  M: public System.Boolean RemoveDecryptionKey(System.String keyId)
+  M: public System.Void AddDecryptionKey(System.String keyId, System.ReadOnlySpan<System.Byte> key)
+  M: public System.Void Dispose()
+  P: public System.Int32 MaximumProtectedStateSize { get; }
+  P: public System.String CurrentKeyId { get; }
+T: public enum SharpTls.TlsApplicationSettingsCodePoint : System.UInt16
+  F: public const SharpTls.TlsApplicationSettingsCodePoint ChromeExperiment = SharpTls.TlsApplicationSettingsCodePoint.ChromeExperiment
+  F: public const SharpTls.TlsApplicationSettingsCodePoint LegacyDraft = SharpTls.TlsApplicationSettingsCodePoint.LegacyDraft
+T: public enum SharpTls.TlsCertificateCompressionAlgorithm : System.UInt16
+  F: public const SharpTls.TlsCertificateCompressionAlgorithm Brotli = SharpTls.TlsCertificateCompressionAlgorithm.Brotli
+  F: public const SharpTls.TlsCertificateCompressionAlgorithm Zlib = SharpTls.TlsCertificateCompressionAlgorithm.Zlib
+T: public enum SharpTls.TlsClientHelloFlight : System.Int32
+  F: public const SharpTls.TlsClientHelloFlight AfterHelloRetryRequest = SharpTls.TlsClientHelloFlight.AfterHelloRetryRequest
+  F: public const SharpTls.TlsClientHelloFlight Initial = SharpTls.TlsClientHelloFlight.Initial
+T: public sealed class SharpTls.TlsClientHelloInspection
+  M: public System.Byte[] GetEncodedHandshake()
+  M: public System.Byte[] GetEncodedTlsRecords()
+  P: public SharpTls.TlsClientHelloFlight Flight { get; }
+  P: public SharpTls.TlsClientHelloWireForm WireForm { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> RecordFragmentSizes { get; }
+  P: public System.Int32 EncodedHandshakeLength { get; }
+  P: public System.Int32 EncodedTlsRecordsLength { get; }
+  P: public System.UInt16 LegacyRecordVersion { get; }
+T: public enum SharpTls.TlsClientHelloWireForm : System.Int32
+  F: public const SharpTls.TlsClientHelloWireForm Direct = SharpTls.TlsClientHelloWireForm.Direct
+  F: public const SharpTls.TlsClientHelloWireForm EncryptedClientHelloOuter = SharpTls.TlsClientHelloWireForm.EncryptedClientHelloOuter
+  F: public const SharpTls.TlsClientHelloWireForm GreaseEncryptedClientHello = SharpTls.TlsClientHelloWireForm.GreaseEncryptedClientHello
+T: public sealed class SharpTls.TlsConnectionState
+  P: public SharpTls.Protocol.NamedGroup Group { get; }
+  P: public SharpTls.Protocol.TlsCipherSuite CipherSuite { get; }
+  P: public SharpTls.Protocol.TlsProtocolVersion ProtocolVersion { get; }
+  P: public SharpTls.Tls13EarlyDataStatus EarlyDataStatus { get; }
+  P: public SharpTls.TlsApplicationSettingsCodePoint? ApplicationSettingsCodePoint { get; }
+  P: public System.Boolean EncryptedClientHelloAccepted { get; }
+  P: public System.Boolean EncryptedClientHelloOffered { get; }
+  P: public System.Boolean ExternalPskWasSelected { get; }
+  P: public System.Boolean GreaseEncryptedClientHelloOffered { get; }
+  P: public System.Boolean LocalClosed { get; }
+  P: public System.Boolean PeerClosed { get; }
+  P: public System.Boolean ServerUsedDelegatedCredential { get; }
+  P: public System.Boolean SessionWasResumed { get; }
+  P: public System.Boolean UsedHelloRetryRequest { get; }
+  P: public System.Byte[]? PeerApplicationSettings { get; }
+  P: public System.Byte[]? StapledOcspResponse { get; }
+  P: public System.Byte[]? TlsUnique { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> PeerCertificateChain { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> SignedCertificateTimestamps { get; }
+  P: public System.DateTimeOffset? ServerDelegatedCredentialExpiresAt { get; }
+  P: public System.Int32 PostHandshakeAuthenticationCount { get; }
+  P: public System.Int32? ReceiveRecordSizeLimit { get; }
+  P: public System.Int32? SendRecordSizeLimit { get; }
+  P: public System.String AuthenticatedServerName { get; }
+  P: public System.String? ApplicationProtocol { get; }
+  P: public System.UInt64 ClientKeyUpdateCount { get; }
+  P: public System.UInt64 ServerKeyUpdateCount { get; }
+T: public sealed class SharpTls.TlsEchConfig
+  M: public System.Byte[] GetEncodedConfig()
+  M: public System.Byte[] GetPublicKey()
+  P: public SharpTls.TlsHpkeKemId KemId { get; }
+  P: public System.Boolean HasUnsupportedMandatoryExtensions { get; }
+  P: public System.Byte ConfigId { get; }
+  P: public System.Byte MaximumNameLength { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsEchConfigExtension> Extensions { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsHpkeSymmetricCipherSuite> CipherSuites { get; }
+  P: public System.String PublicName { get; }
+  P: public System.UInt16 Version { get; }
+T: public sealed class SharpTls.TlsEchConfigExtension
+  M: public System.Byte[] GetData()
+  P: public System.Boolean IsMandatory { get; }
+  P: public System.UInt16 Type { get; }
+T: public sealed class SharpTls.TlsEchConfigList
+  M: public System.Byte[] GetEncodedList()
+  M: public static SharpTls.TlsEchConfigList Parse(System.ReadOnlySpan<System.Byte> encoded)
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsEchConfig> Configurations { get; }
+  P: public System.Int32 UnknownVersionCount { get; }
+T: public sealed class SharpTls.TlsEchDnsCache
+  C: public SharpTls.TlsEchDnsCache(System.Int32 capacity = 256)
+  M: public System.Void Clear()
+  P: public System.Int32 Count { get; }
+T: public sealed class SharpTls.TlsEchDnsEndpoint
+  M: public System.Void ConfigureClient(SharpTls.CustomTlsClientOptions options, SharpTls.ClientHelloProfile? outerClientHello = default, System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsExtensionType>? compressedOuterExtensions = default)
+  P: public SharpTls.TlsEchConfigList? EchConfigList { get; }
+  P: public System.Boolean HasNoDefaultAlpn { get; }
+  P: public System.Boolean IsFallback { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Net.IPAddress> Ipv4Hints { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Net.IPAddress> Ipv6Hints { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> AlpnProtocols { get; }
+  P: public System.DateTimeOffset ExpiresAt { get; }
+  P: public System.Int32 Port { get; }
+  P: public System.String OriginName { get; }
+  P: public System.String TargetName { get; }
+  P: public System.UInt16 Priority { get; }
+T: public enum SharpTls.TlsEchDnsErrorKind : System.Int32
+  F: public const SharpTls.TlsEchDnsErrorKind AuthenticationRequired = SharpTls.TlsEchDnsErrorKind.AuthenticationRequired
+  F: public const SharpTls.TlsEchDnsErrorKind DnsResponseError = SharpTls.TlsEchDnsErrorKind.DnsResponseError
+  F: public const SharpTls.TlsEchDnsErrorKind EchRequired = SharpTls.TlsEchDnsErrorKind.EchRequired
+  F: public const SharpTls.TlsEchDnsErrorKind MalformedResponse = SharpTls.TlsEchDnsErrorKind.MalformedResponse
+  F: public const SharpTls.TlsEchDnsErrorKind MalformedServiceBinding = SharpTls.TlsEchDnsErrorKind.MalformedServiceBinding
+  F: public const SharpTls.TlsEchDnsErrorKind TransportFailure = SharpTls.TlsEchDnsErrorKind.TransportFailure
+T: public sealed class SharpTls.TlsEchDnsException : System.IO.IOException, System.Runtime.Serialization.ISerializable
+  P: public SharpTls.TlsEchDnsErrorKind ErrorKind { get; }
+T: public enum SharpTls.TlsEchDnsFallbackPolicy : System.Int32
+  F: public const SharpTls.TlsEchDnsFallbackPolicy DirectConnectionAllowed = SharpTls.TlsEchDnsFallbackPolicy.DirectConnectionAllowed
+  F: public const SharpTls.TlsEchDnsFallbackPolicy EchRequired = SharpTls.TlsEchDnsFallbackPolicy.EchRequired
+T: public sealed class SharpTls.TlsEchDnsOverHttpsOptions
+  C: public SharpTls.TlsEchDnsOverHttpsOptions()
+  P: public SharpTls.ClientHelloProfile ClientHello { get; set; }
+  P: public SharpTls.CustomTlsCertificateValidationOptions CertificateValidation { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Net.IPEndPoint>? BootstrapEndpoints { get; set; }
+  P: public System.Int32 MaximumResponseHeaderSize { get; set; }
+  P: public System.Uri? Endpoint { get; set; }
+T: public sealed class SharpTls.TlsEchDnsOverTlsOptions
+  C: public SharpTls.TlsEchDnsOverTlsOptions()
+  P: public SharpTls.ClientHelloProfile ClientHello { get; set; }
+  P: public SharpTls.CustomTlsCertificateValidationOptions CertificateValidation { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Net.IPEndPoint>? BootstrapEndpoints { get; set; }
+  P: public System.String? ResolverName { get; set; }
+T: public sealed class SharpTls.TlsEchDnsResolution
+  P: public SharpTls.TlsEchDnsFallbackPolicy FallbackPolicy { get; }
+  P: public System.Boolean IsDnsSecAuthenticated { get; }
+  P: public System.Boolean IsMixedEchDeployment { get; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsEchDnsEndpoint> Endpoints { get; }
+  P: public System.DateTimeOffset ExpiresAt { get; }
+  P: public System.Int32 OriginPort { get; }
+  P: public System.String OriginName { get; }
+T: public sealed class SharpTls.TlsEchDnsResolver
+  C: public SharpTls.TlsEchDnsResolver(SharpTls.TlsEchDnsResolverOptions? options = default)
+  M: public System.Threading.Tasks.Task<SharpTls.TlsEchDnsResolution> ResolveAsync(System.String originName, System.Int32 originPort = 443, System.Threading.CancellationToken cancellationToken = default)
+T: public sealed class SharpTls.TlsEchDnsResolverOptions
+  C: public SharpTls.TlsEchDnsResolverOptions()
+  P: public SharpTls.TlsEchDnsCache? Cache { get; set; }
+  P: public SharpTls.TlsEchDnsOverHttpsOptions? DnsOverHttps { get; set; }
+  P: public SharpTls.TlsEchDnsOverTlsOptions? DnsOverTls { get; set; }
+  P: public System.Boolean AllowDirectFallbackOnDnsError { get; set; }
+  P: public System.Boolean RequestDnsSec { get; set; }
+  P: public System.Boolean RequireAuthenticatedData { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Net.IPEndPoint>? NameServers { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> SupportedAlpnProtocols { get; set; }
+  P: public System.Int32 CacheCapacity { get; set; }
+  P: public System.Int32 MaximumAliasDepth { get; set; }
+  P: public System.Int32 MaximumRecords { get; set; }
+  P: public System.Int32 MaximumResponseSize { get; set; }
+  P: public System.TimeSpan MaximumCacheLifetime { get; set; }
+  P: public System.TimeSpan QueryTimeout { get; set; }
+  P: public System.UInt16 UdpPayloadSize { get; set; }
+T: public sealed class SharpTls.TlsEchGreaseOptions
+  C: public SharpTls.TlsEchGreaseOptions()
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.TlsHpkeSymmetricCipherSuite> CipherSuites { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32>? PayloadLengths { get; set; }
+T: public sealed class SharpTls.TlsEchOptions
+  C: public SharpTls.TlsEchOptions()
+  P: public SharpTls.ClientHelloProfile OuterClientHello { get; set; }
+  P: public SharpTls.TlsEchConfigList ConfigList { get; set; }
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.TlsExtensionType> CompressedOuterExtensions { get; set; }
+T: public sealed class SharpTls.TlsEchRejectedException : System.IO.IOException, System.Runtime.Serialization.ISerializable
+  P: public SharpTls.TlsEchConfigList? RetryConfigurations { get; }
+  P: public System.String PublicName { get; }
+T: public sealed class SharpTls.TlsEchServerKey : System.IDisposable
+  C: public SharpTls.TlsEchServerKey(SharpTls.TlsEchConfig configuration, System.ReadOnlySpan<System.Byte> privateKey, System.Boolean sendAsRetry = false)
+  M: public System.Void Dispose()
+  P: public SharpTls.TlsEchConfig Configuration { get; }
+  P: public System.Boolean SendAsRetry { get; }
+T: public sealed class SharpTls.TlsHandshakeEvent
+  P: public SharpTls.Protocol.TlsProtocolVersion? ProtocolVersion { get; }
+  P: public SharpTls.TlsClientHelloFlight? ClientHelloFlight { get; }
+  P: public SharpTls.TlsHandshakeEventDirection Direction { get; }
+  P: public SharpTls.TlsHandshakeEventKind Kind { get; }
+  P: public System.Int32 EncodedLength { get; }
+  P: public System.Int64 SequenceNumber { get; }
+T: public enum SharpTls.TlsHandshakeEventDirection : System.Int32
+  F: public const SharpTls.TlsHandshakeEventDirection ClientToServer = SharpTls.TlsHandshakeEventDirection.ClientToServer
+  F: public const SharpTls.TlsHandshakeEventDirection Local = SharpTls.TlsHandshakeEventDirection.Local
+  F: public const SharpTls.TlsHandshakeEventDirection ServerToClient = SharpTls.TlsHandshakeEventDirection.ServerToClient
+T: public enum SharpTls.TlsHandshakeEventKind : System.Int32
+  F: public const SharpTls.TlsHandshakeEventKind Certificate = SharpTls.TlsHandshakeEventKind.Certificate
+  F: public const SharpTls.TlsHandshakeEventKind CertificateRequest = SharpTls.TlsHandshakeEventKind.CertificateRequest
+  F: public const SharpTls.TlsHandshakeEventKind CertificateVerify = SharpTls.TlsHandshakeEventKind.CertificateVerify
+  F: public const SharpTls.TlsHandshakeEventKind ClientHello = SharpTls.TlsHandshakeEventKind.ClientHello
+  F: public const SharpTls.TlsHandshakeEventKind ClientKeyExchange = SharpTls.TlsHandshakeEventKind.ClientKeyExchange
+  F: public const SharpTls.TlsHandshakeEventKind EncryptedExtensions = SharpTls.TlsHandshakeEventKind.EncryptedExtensions
+  F: public const SharpTls.TlsHandshakeEventKind Finished = SharpTls.TlsHandshakeEventKind.Finished
+  F: public const SharpTls.TlsHandshakeEventKind HandshakeCompleted = SharpTls.TlsHandshakeEventKind.HandshakeCompleted
+  F: public const SharpTls.TlsHandshakeEventKind HelloRetryRequest = SharpTls.TlsHandshakeEventKind.HelloRetryRequest
+  F: public const SharpTls.TlsHandshakeEventKind KeyUpdate = SharpTls.TlsHandshakeEventKind.KeyUpdate
+  F: public const SharpTls.TlsHandshakeEventKind NewSessionTicket = SharpTls.TlsHandshakeEventKind.NewSessionTicket
+  F: public const SharpTls.TlsHandshakeEventKind ServerHello = SharpTls.TlsHandshakeEventKind.ServerHello
+  F: public const SharpTls.TlsHandshakeEventKind ServerHelloDone = SharpTls.TlsHandshakeEventKind.ServerHelloDone
+  F: public const SharpTls.TlsHandshakeEventKind ServerKeyExchange = SharpTls.TlsHandshakeEventKind.ServerKeyExchange
+T: public enum SharpTls.TlsHpkeAeadId : System.UInt16
+  F: public const SharpTls.TlsHpkeAeadId Aes128Gcm = SharpTls.TlsHpkeAeadId.Aes128Gcm
+  F: public const SharpTls.TlsHpkeAeadId Aes256Gcm = SharpTls.TlsHpkeAeadId.Aes256Gcm
+  F: public const SharpTls.TlsHpkeAeadId ChaCha20Poly1305 = SharpTls.TlsHpkeAeadId.ChaCha20Poly1305
+T: public enum SharpTls.TlsHpkeKdfId : System.UInt16
+  F: public const SharpTls.TlsHpkeKdfId HkdfSha256 = SharpTls.TlsHpkeKdfId.HkdfSha256
+  F: public const SharpTls.TlsHpkeKdfId HkdfSha384 = SharpTls.TlsHpkeKdfId.HkdfSha384
+  F: public const SharpTls.TlsHpkeKdfId HkdfSha512 = SharpTls.TlsHpkeKdfId.HkdfSha512
+T: public enum SharpTls.TlsHpkeKemId : System.UInt16
+  F: public const SharpTls.TlsHpkeKemId DhkemP256HkdfSha256 = SharpTls.TlsHpkeKemId.DhkemP256HkdfSha256
+  F: public const SharpTls.TlsHpkeKemId DhkemP384HkdfSha384 = SharpTls.TlsHpkeKemId.DhkemP384HkdfSha384
+  F: public const SharpTls.TlsHpkeKemId DhkemP521HkdfSha512 = SharpTls.TlsHpkeKemId.DhkemP521HkdfSha512
+  F: public const SharpTls.TlsHpkeKemId DhkemX25519HkdfSha256 = SharpTls.TlsHpkeKemId.DhkemX25519HkdfSha256
+T: public readonly struct SharpTls.TlsHpkeSymmetricCipherSuite : System.IEquatable<SharpTls.TlsHpkeSymmetricCipherSuite>
+  C: public SharpTls.TlsHpkeSymmetricCipherSuite(SharpTls.TlsHpkeKdfId KdfId, SharpTls.TlsHpkeAeadId AeadId)
+  P: public SharpTls.TlsHpkeAeadId AeadId { get; init; }
+  P: public SharpTls.TlsHpkeKdfId KdfId { get; init; }
+T: public sealed class SharpTls.TlsNssKeyLogSink : System.IAsyncDisposable, System.IDisposable
+  C: public SharpTls.TlsNssKeyLogSink(System.IO.Stream output, System.Boolean acknowledgeSecretExposure, System.Boolean leaveOpen = true)
+  M: public System.Threading.Tasks.ValueTask DisposeAsync()
+  M: public System.Void Dispose()
+T: public sealed class SharpTls.TlsRecordFragmentation
+  C: public SharpTls.TlsRecordFragmentation(System.Int32 maximumFragmentSize = 16384, System.Collections.Generic.IEnumerable<System.Int32>? explicitFragmentSizes = default)
+  P: public SharpTls.TlsRecordFragmentation Default { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.Int32> ExplicitFragmentSizes { get; }
+  P: public System.Int32 MaximumFragmentSize { get; }
+T: public sealed class SharpTls.TlsServerCertificateSelectionContext
+  P: public System.Collections.Generic.IReadOnlyList<SharpTls.Protocol.SignatureScheme> SignatureAlgorithms { get; }
+  P: public System.Collections.Generic.IReadOnlyList<System.String> AlpnProtocols { get; }
+  P: public System.String? ServerName { get; }
+T: public delegate System.Threading.Tasks.ValueTask<SharpTls.Certificates.TlsServerCertificate?> SharpTls.TlsServerCertificateSelector(SharpTls.TlsServerCertificateSelectionContext context, System.Threading.CancellationToken cancellationToken)
+T: public enum SharpTls.TlsServerClientAuthenticationMode : System.Int32
+  F: public const SharpTls.TlsServerClientAuthenticationMode None = SharpTls.TlsServerClientAuthenticationMode.None
+  F: public const SharpTls.TlsServerClientAuthenticationMode Request = SharpTls.TlsServerClientAuthenticationMode.Request
+  F: public const SharpTls.TlsServerClientAuthenticationMode Require = SharpTls.TlsServerClientAuthenticationMode.Require

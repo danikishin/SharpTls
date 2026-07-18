@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">SharpTls</title>
+  <desc id="desc">A violet shield containing a cyan TLS waveform and a sharp white S.</desc>
+  <defs>
+    <linearGradient id="shell" x1="34" y1="24" x2="222" y2="230" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="0.55" stop-color="#5B21B6"/>
+      <stop offset="1" stop-color="#312E81"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="55" y1="52" x2="202" y2="205" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  <path d="M128 14 222 48v68c0 61-37 103-94 126-57-23-94-65-94-126V48l94-34Z" fill="url(#shell)" filter="url(#shadow)"/>
+  <path d="M128 29 207 58v58c0 51-29 87-79 109-50-22-79-58-79-109V58l79-29Z" fill="none" stroke="url(#edge)" stroke-width="4"/>
+  <path d="M182 72H113c-21 0-35 11-35 28 0 16 12 24 33 28l28 5c10 2 15 6 15 13 0 8-7 13-19 13H74" fill="none" stroke="#F8FAFC" stroke-linecap="round" stroke-linejoin="round" stroke-width="18"/>
+  <path d="m165 113 19 15-19 15M91 143l-19-15 19-15" fill="none" stroke="#67E8F9" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <circle cx="128" cy="128" r="6" fill="#67E8F9"/>
+</svg>

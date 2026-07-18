@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="src/SharpTls/SharpTls.csproj" />
+  <Project Path="tests/SharpTls.Tests/SharpTls.Tests.csproj" />
+  <Project Path="samples/SharpTls.Http11/SharpTls.Http11.csproj" />
+  <Project Path="benchmarks/SharpTls.Benchmarks/SharpTls.Benchmarks.csproj" />
+  <Project Path="tools/SharpTls.ApiCompat/SharpTls.ApiCompat.csproj" />
+  <Project Path="tools/SharpTls.CoverageFuzz/SharpTls.CoverageFuzz.csproj" />
+  <Project Path="tools/SharpTls.Fuzz/SharpTls.Fuzz.csproj" />
+  <Project Path="tools/SharpTls.PackageReproducibility/SharpTls.PackageReproducibility.csproj" />
+</Solution>

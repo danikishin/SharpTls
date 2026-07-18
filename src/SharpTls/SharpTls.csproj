@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>SharpTls</PackageId>
+    <PackageTitle>SharpTls</PackageTitle>
+    <Version>0.9.0-preview.1</Version>
+    <Authors>SharpTls contributors</Authors>
+    <Copyright>Copyright © 2026 SharpTls contributors</Copyright>
+    <Description>A pure managed TLS 1.3 and secure TLS 1.2 client/server library for .NET 9+ with byte-exact uTLS-style ClientHello control, ECH, sessions, and recordless QUIC-TLS adapters.</Description>
+    <PackageReadmeFile>PACKAGE-README.md</PackageReadmeFile>
+    <PackageIcon>sharptls-icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>tls;tls13;tls12;utls;clienthello;fingerprint;ech;quic;cryptography;networking</PackageTags>
+    <PackageReleaseNotes>Pre-1.0 preview. See CHANGELOG.md and docs/RELEASE-HARDENING.md for changes and release gates.</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType Condition="'$(RepositoryType)' == '' and '$(GITHUB_REPOSITORY)' != ''">git</RepositoryType>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == '' and '$(GITHUB_REPOSITORY)' != ''">https://github.com/$(GITHUB_REPOSITORY)</RepositoryUrl>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == '' and '$(GITHUB_REPOSITORY)' != ''">https://github.com/$(GITHUB_REPOSITORY)</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../PACKAGE-README.md" Pack="true" PackagePath="/" />
+    <None Include="../../CHANGELOG.md" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../SECURITY.md" Pack="true" PackagePath="/" />
+    <None Include="../../docs/*.md" Pack="true" PackagePath="docs/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <None Include="../../.github/assets/sharptls-icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a standards-based addition within SharpTls's TLS boundary.
+title: "[Feature]: "
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the interoperability or protocol need, not only the desired API.
+    validations:
+      required: true
+  - type: input
+    id: standard
+    attributes:
+      label: Standard or upstream reference
+      placeholder: RFC number and sections, IANA registry, or pinned upstream uTLS source
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed SharpTls surface
+      description: Explain wire behavior, state transitions, validation and caller ownership.
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and compatibility considerations
+      description: Cover downgrade, authentication, parsing bounds, secret lifetime and profile compatibility.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Project boundary
+      options:
+        - label: This belongs to a TLS engine or ClientHello/QUIC-TLS handshake adapter, not an HTTP or full QUIC transport stack.
+          required: true

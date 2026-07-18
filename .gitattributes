@@ -1,0 +1,24 @@
+* text=auto eol=lf
+
+*.cs text diff=csharp
+*.csproj text
+*.slnx text
+*.props text
+*.targets text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+*.svg text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pfx binary
+*.p12 binary
+*.der binary
+*.pcap binary
+*.pcapng binary
+*.nupkg binary
+*.snupkg binary

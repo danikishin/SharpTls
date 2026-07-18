@@ -1,0 +1,68 @@
+name: Bug report
+description: Report reproducible SharpTls behavior that appears incorrect.
+title: "[Bug]: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve SharpTls. Do not disclose vulnerabilities or attach live secrets here; follow SECURITY.md instead.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SharpTls version or commit
+      placeholder: 0.9.0-preview.1 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime and operating system
+      placeholder: .NET 9.0.x on Ubuntu 24.04 x64
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - ClientHello / profile
+        - TLS client
+        - TLS server
+        - Certificates / authentication
+        - Sessions / PSK / 0-RTT
+        - ECH / DNS discovery
+        - QUIC-TLS adapter
+        - Packaging / documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: Include bounded sample code or a link to a minimal repository. Redact all sensitive material.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Failure and protocol evidence
+      description: Include exception type/message, alert, negotiated values, or a redacted capture summary.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed private keys, session secrets, decrypted traffic and sensitive host data.
+          required: true
+        - label: This is not a privately reportable security vulnerability.
+          required: true
