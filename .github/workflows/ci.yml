@@ -112,7 +112,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dotnet publish tools/SharpTls.CoverageFuzz/SharpTls.CoverageFuzz.csproj --configuration Release --runtime linux-x64 --self-contained true --output artifacts/coverage-fuzz
+          dotnet publish tools/SharpTls.CoverageFuzz/SharpTls.CoverageFuzz.csproj --configuration Release --output artifacts/coverage-fuzz
           test -f artifacts/coverage-fuzz/SharpFuzz.dll
           test -f artifacts/coverage-fuzz/SharpFuzz.Common.dll
           test -f artifacts/coverage-fuzz/dnlib.dll
@@ -123,7 +123,6 @@ jobs:
           set -euo pipefail
           dotnet tool install SharpFuzz.CommandLine --tool-path artifacts/sharpfuzz-cli --version 2.3.0
           artifacts/sharpfuzz-cli/sharpfuzz artifacts/coverage-fuzz/SharpTls.dll
-          artifacts/sharpfuzz-cli/sharpfuzz artifacts/coverage-fuzz/SharpTls.CoverageFuzz.dll
       - name: Build the hash-verified pinned libFuzzer driver
         shell: bash
         run: |
@@ -140,7 +139,8 @@ jobs:
           for target in "${targets[@]}"; do
             mkdir -p "artifacts/fuzz-artifacts/$target"
             SHARPTLS_COVERAGE_FUZZ_TARGET="$target" artifacts/libfuzzer-dotnet \
-              --target_path="$(pwd)/artifacts/coverage-fuzz/SharpTls.CoverageFuzz" \
+              --target_path=dotnet \
+              --target_arg="$(pwd)/artifacts/coverage-fuzz/SharpTls.CoverageFuzz.dll" \
               -max_total_time=60 -timeout=5 -rss_limit_mb=1536 -max_len=65535 \
               -print_final_stats=1 -artifact_prefix="artifacts/fuzz-artifacts/$target/" \
               "artifacts/fuzz-corpus/$target"
