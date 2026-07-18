@@ -6,6 +6,13 @@ the preview period, minor releases may intentionally revise public APIs.
 
 ## [Unreleased]
 
+## [0.9.0-preview.3] - 2026-07-18
+
+### Fixed
+
+- Include the SharpFuzz runtime dependency closure in the self-contained coverage-fuzz
+  harness used by release qualification.
+
 ## [0.9.0-preview.2] - 2026-07-18
 
 ### Added

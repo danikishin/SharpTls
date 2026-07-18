@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>SharpTls.CoverageFuzz</AssemblyName>
     <IsPackable>false</IsPackable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/SharpTls/SharpTls.csproj" />
