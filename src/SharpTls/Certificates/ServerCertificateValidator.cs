@@ -40,7 +40,7 @@ internal static class ServerCertificateValidator
 
         if (!chain.Build(message.Leaf))
         {
-            throw MapChainFailure(chain.ChainStatus);
+            throw MapChainFailure(chain, policy.CustomTrustRoots);
         }
 
         var normalizedName = NormalizeReferenceIdentity(serverName);
@@ -212,8 +212,11 @@ internal static class ServerCertificateValidator
                    DSASignatureFormat.Rfc3279DerSequence);
     }
 
-    private static TlsProtocolException MapChainFailure(X509ChainStatus[] statuses)
+    private static TlsProtocolException MapChainFailure(
+        X509Chain chain,
+        X509Certificate2Collection? customTrustRoots)
     {
+        var statuses = chain.ChainStatus;
         if (statuses.Any(status => (status.Status & X509ChainStatusFlags.Revoked) != 0))
         {
             return new TlsProtocolException(TlsAlertDescription.CertificateRevoked, "Certificate is revoked.");
@@ -229,6 +232,13 @@ internal static class ServerCertificateValidator
         {
             return new TlsProtocolException(TlsAlertDescription.UnknownCa, "Certificate chain is not trusted.");
         }
+        if (customTrustRoots is { Count: > 0 } &&
+            !TerminatesAtCustomTrustRoot(chain, customTrustRoots))
+        {
+            return new TlsProtocolException(
+                TlsAlertDescription.UnknownCa,
+                "Certificate chain does not terminate at a configured trust root.");
+        }
 
         var details = string.Join(
             "; ",
@@ -236,6 +246,26 @@ internal static class ServerCertificateValidator
         return new TlsProtocolException(
             TlsAlertDescription.BadCertificate,
             $"Certificate chain validation failed: {details}.");
+    }
+
+    private static bool TerminatesAtCustomTrustRoot(
+        X509Chain chain,
+        X509Certificate2Collection customTrustRoots)
+    {
+        if (chain.ChainElements.Count == 0)
+        {
+            return false;
+        }
+
+        var terminalCertificate = chain.ChainElements[^1].Certificate;
+        foreach (X509Certificate2 root in customTrustRoots)
+        {
+            if (terminalCertificate.RawDataMemory.Span.SequenceEqual(root.RawDataMemory.Span))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static string NormalizeReferenceIdentity(string serverName)

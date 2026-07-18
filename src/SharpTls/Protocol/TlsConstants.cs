@@ -5,6 +5,7 @@ internal static class TlsConstants
     internal const ushort LegacyRecordVersion = 0x0303;
     internal const ushort Tls12Version = 0x0303;
     internal const ushort Tls13Version = 0x0304;
+    internal const ushort TlsEmptyRenegotiationInfoScsv = 0x00FF;
     internal const int RecordHeaderLength = 5;
     internal const int HandshakeHeaderLength = 4;
     internal const int MaxPlaintextLength = 1 << 14;

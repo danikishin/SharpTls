@@ -135,7 +135,10 @@ internal sealed class EcdheKeyShare : IKeyShare
         {
             throw;
         }
-        catch (CryptographicException exception)
+        catch (Exception exception) when (exception is
+            CryptographicException or
+            PlatformNotSupportedException or
+            ArgumentException)
         {
             throw new TlsProtocolException(
                 TlsAlertDescription.IllegalParameter,

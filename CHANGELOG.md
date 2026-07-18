@@ -11,6 +11,17 @@ the preview period, minor releases may intentionally revise public APIs.
 - GitHub-ready project presentation, contribution templates and automated tag releases.
 - Reproducible NuGet package and symbol publication through GitHub Actions.
 
+### Fixed
+
+- Accept RFC 5746 `TLS_EMPTY_RENEGOTIATION_INFO_SCSV` as the initial TLS 1.2 secure-
+  renegotiation signal while continuing to require Extended Master Secret.
+- Normalize platform-provider invalid NIST ECDH point errors to the protocol's
+  `illegal_parameter` alert on every supported operating system.
+- Classify custom-root chain termination failures consistently as `unknown_ca` across
+  platform X.509 providers.
+- Load Windows Schannel interoperability credentials through a non-ephemeral test key
+  container and update hosted actions to their Node.js 24 releases.
+
 ## [0.9.0-preview.1] - 2026-07-18
 
 ### Added

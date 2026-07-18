@@ -91,7 +91,9 @@ internal static class Tls12ClientHelloParser
         }
         var random = reader.ReadBytes(TlsConstants.RandomLength).ToArray();
         var sessionId = reader.ReadVector8(TlsConstants.MaxSessionIdLength).ToArray();
-        var cipherSuites = ParseCipherSuites(reader.ReadVector16());
+        var cipherSuites = ParseCipherSuites(
+            reader.ReadVector16(),
+            out var hasSecureRenegotiationScsv);
         var compression = reader.ReadVector8();
         if (!compression.Contains((byte)0))
         {
@@ -109,7 +111,7 @@ internal static class Tls12ClientHelloParser
         string? serverName = null;
         byte[]? sessionTicket = null;
         var hasEms = false;
-        var hasSecureRenegotiation = false;
+        var hasSecureRenegotiation = hasSecureRenegotiationScsv;
         while (!extensions.End)
         {
             var type = extensions.ReadUInt16();
@@ -178,7 +180,9 @@ internal static class Tls12ClientHelloParser
             bodies);
     }
 
-    private static TlsCipherSuite[] ParseCipherSuites(ReadOnlySpan<byte> encoded)
+    private static TlsCipherSuite[] ParseCipherSuites(
+        ReadOnlySpan<byte> encoded,
+        out bool hasSecureRenegotiationScsv)
     {
         if (encoded.Length < 2 || (encoded.Length & 1) != 0)
         {
@@ -187,12 +191,18 @@ internal static class Tls12ClientHelloParser
         var reader = new TlsBinaryReader(encoded);
         var result = new List<TlsCipherSuite>();
         var seen = new HashSet<ushort>();
+        hasSecureRenegotiationScsv = false;
         while (!reader.End)
         {
             var value = reader.ReadUInt16();
             if (!seen.Add(value))
             {
                 throw TlsProtocolException.Illegal("TLS 1.2 cipher_suites contains a duplicate.");
+            }
+            if (value == TlsConstants.TlsEmptyRenegotiationInfoScsv)
+            {
+                hasSecureRenegotiationScsv = true;
+                continue;
             }
             if (Enum.IsDefined(typeof(TlsCipherSuite), value))
             {

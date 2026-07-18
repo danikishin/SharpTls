@@ -309,8 +309,7 @@ public sealed class ClientCertificateInteropTests
         using var clientPki = TestPki.Create(
             dnsName: "client.example",
             serverAuthenticationEku: false);
-        using var serverLeafWithKey = serverPki.Leaf.CopyWithPrivateKey(
-            (RSA)serverPki.LeafKey);
+        using var serverLeafWithKey = serverPki.CreateLeafWithPrivateKeyForPlatformTls();
         using var clientLeafWithKey = clientPki.Leaf.CopyWithPrivateKey(
             (RSA)clientPki.LeafKey);
         using var clientCredential = new TlsClientCertificate(

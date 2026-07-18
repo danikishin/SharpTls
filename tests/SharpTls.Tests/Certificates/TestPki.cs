@@ -19,6 +19,41 @@ internal sealed class TestPki : IDisposable
     internal X509Certificate2 Leaf { get; }
     internal AsymmetricAlgorithm LeafKey { get; }
 
+    internal X509Certificate2 CreateLeafWithPrivateKeyForPlatformTls()
+    {
+        var withKey = LeafKey switch
+        {
+            RSA rsa => Leaf.CopyWithPrivateKey(rsa),
+            ECDsa ecdsa => Leaf.CopyWithPrivateKey(ecdsa),
+            _ => throw new NotSupportedException(
+                $"Unsupported test leaf key type {LeafKey.GetType().Name}."),
+        };
+        if (!OperatingSystem.IsWindows())
+        {
+            return withKey;
+        }
+
+        try
+        {
+            var pfx = withKey.Export(X509ContentType.Pfx);
+            try
+            {
+                return X509CertificateLoader.LoadPkcs12(
+                    pfx,
+                    password: null,
+                    X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.Exportable);
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(pfx);
+            }
+        }
+        finally
+        {
+            withKey.Dispose();
+        }
+    }
+
     internal static TestPki Create(
         string dnsName = "example.com",
         bool ecdsaLeaf = false,
