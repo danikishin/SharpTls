@@ -1,6 +1,7 @@
 using SharpTls.Handshake;
 using SharpTls.IO;
 using SharpTls.Protocol;
+using SharpTls.Quic;
 
 namespace SharpTls.Tests.ClientHello;
 
@@ -223,6 +224,26 @@ public sealed class ClientHelloCaptureTests
         var captured = profile.BuildDeterministicForTesting("example.com", [1, 2, 3]);
 
         Assert.Throws<TlsProtocolException>(() => ClientHelloCapture.Import(captured));
+    }
+
+    [Fact]
+    public void TruncatedCapturedQuicTransportParameterIsRejectedAtTheQuicBoundary()
+    {
+        var profile = ClientHelloProfiles.Custom(builder => builder.WithExtensionLayout(
+            ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.ServerName),
+            ClientHelloExtensionSpec.Raw(0xFDE8, [0x40]),
+            ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.SupportedVersions),
+            ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.SupportedGroups),
+            ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.SignatureAlgorithms),
+            ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.KeyShare)));
+        var captured = profile.BuildDeterministicForTesting("example.com", [4, 2, 4, 2]);
+        var rawExtensionOffset = captured.AsSpan().IndexOf(
+            new byte[] { 0xFD, 0xE8, 0, 1, 0x40 });
+        Assert.True(rawExtensionOffset >= 0);
+        captured[rawExtensionOffset] = 0;
+        captured[rawExtensionOffset + 1] = (byte)TlsExtensionType.QuicTransportParameters;
+
+        Assert.Throws<TlsQuicTransportException>(() => ClientHelloCapture.Import(captured));
     }
 
     private static ClientHelloProfile CreateImportableProfile() =>

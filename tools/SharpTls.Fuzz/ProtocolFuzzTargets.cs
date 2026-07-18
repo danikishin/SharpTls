@@ -882,6 +882,7 @@ internal sealed class ProtocolFuzzTargets : IDisposable
     {
         try { action(); }
         catch (TlsProtocolException) { }
+        catch (TlsQuicTransportException) { }
         catch (NotSupportedException) { }
     }
 

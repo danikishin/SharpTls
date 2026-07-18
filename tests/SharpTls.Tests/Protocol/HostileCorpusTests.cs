@@ -1,6 +1,7 @@
 using SharpTls.Certificates;
 using SharpTls.Handshake;
 using SharpTls.Protocol;
+using SharpTls.Quic;
 
 namespace SharpTls.Tests.Protocol;
 
@@ -68,6 +69,10 @@ public sealed class HostileCorpusTests
         catch (TlsProtocolException)
         {
             // Structurally invalid TLS wire data.
+        }
+        catch (TlsQuicTransportException)
+        {
+            // Invalid QUIC transport parameters embedded in a captured ClientHello.
         }
         catch (NotSupportedException)
         {
