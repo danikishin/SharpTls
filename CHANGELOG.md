@@ -6,6 +6,8 @@ the preview period, minor releases may intentionally revise public APIs.
 
 ## [Unreleased]
 
+## [0.9.0-preview.2] - 2026-07-18
+
 ### Added
 
 - GitHub-ready project presentation, contribution templates and automated tag releases.

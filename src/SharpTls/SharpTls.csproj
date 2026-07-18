@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>SharpTls</PackageId>
     <PackageTitle>SharpTls</PackageTitle>
-    <Version>0.9.0-preview.1</Version>
+    <Version>0.9.0-preview.2</Version>
     <Authors>SharpTls contributors</Authors>
     <Copyright>Copyright © 2026 SharpTls contributors</Copyright>
     <Description>A pure managed TLS 1.3 and secure TLS 1.2 client/server library for .NET 9+ with byte-exact uTLS-style ClientHello control, ECH, sessions, and recordless QUIC-TLS adapters.</Description>
