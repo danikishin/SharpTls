@@ -10,8 +10,9 @@ the preview period, minor releases may intentionally revise public APIs.
 
 ### Fixed
 
-- Include the SharpFuzz runtime dependency closure and use the upstream framework-
-  dependent libFuzzer launch contract in release qualification.
+- Include the SharpFuzz runtime dependency closure, use the upstream framework-dependent
+  libFuzzer launch contract, and defer instrumented target construction until the native
+  coverage map is initialized during release qualification.
 
 ## [0.9.0-preview.2] - 2026-07-18
 

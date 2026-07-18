@@ -9,5 +9,18 @@ if (!ProtocolFuzzTargets.TargetNames.Contains(target, StringComparer.Ordinal))
         $"SHARPTLS_COVERAGE_FUZZ_TARGET must be one of: {string.Join(", ", ProtocolFuzzTargets.TargetNames)}.");
 }
 
-using var targets = new ProtocolFuzzTargets();
-Fuzzer.LibFuzzer.Run(input => targets.Run(target, input));
+ProtocolFuzzTargets? targets = null;
+try
+{
+    Fuzzer.LibFuzzer.Run(input =>
+    {
+        // SharpFuzz initializes its native coverage map before invoking this callback.
+        // Constructing an instrumented type earlier writes through an uninitialized map.
+        targets ??= new ProtocolFuzzTargets();
+        targets.Run(target, input);
+    });
+}
+finally
+{
+    targets?.Dispose();
+}
