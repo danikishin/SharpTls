@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/SharpTls/SharpTls.csproj" />
-    <PackageReference Include="SharpFuzz" Version="2.3.0" PrivateAssets="all" />
+    <PackageReference Include="SharpFuzz" Version="2.3.0" />
     <Compile Include="../SharpTls.Fuzz/ProtocolFuzzTargets.cs"
              Link="ProtocolFuzzTargets.cs" />
   </ItemGroup>

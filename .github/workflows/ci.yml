@@ -113,6 +113,9 @@ jobs:
         run: |
           set -euo pipefail
           dotnet publish tools/SharpTls.CoverageFuzz/SharpTls.CoverageFuzz.csproj --configuration Release --runtime linux-x64 --self-contained true --output artifacts/coverage-fuzz
+          test -f artifacts/coverage-fuzz/SharpFuzz.dll
+          test -f artifacts/coverage-fuzz/SharpFuzz.Common.dll
+          test -f artifacts/coverage-fuzz/dnlib.dll
           dotnet run --project tools/SharpTls.Fuzz/SharpTls.Fuzz.csproj --configuration Release -- --target all --export-corpus artifacts/fuzz-corpus
       - name: Install and apply the pinned SharpFuzz instrumenter
         shell: bash
