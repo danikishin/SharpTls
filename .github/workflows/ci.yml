@@ -76,7 +76,7 @@ jobs:
           dotnet new console --framework net9.0 --output artifacts/package-consumer
           dotnet add artifacts/package-consumer/package-consumer.csproj package SharpTls --prerelease --source "$(pwd)/artifacts/pack-a"
           dotnet build artifacts/package-consumer/package-consumer.csproj --configuration Release
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sharptls-preview-packages
           path: artifacts/pack-a/*
@@ -142,7 +142,7 @@ jobs:
               -print_final_stats=1 -artifact_prefix="artifacts/fuzz-artifacts/$target/" \
               "artifacts/fuzz-corpus/$target"
           done
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: sharptls-coverage-fuzz-${{ github.run_id }}
@@ -228,7 +228,7 @@ jobs:
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: artifacts/release/*
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sharptls-${{ github.ref_name }}-attested
           path: artifacts/release/*
