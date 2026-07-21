@@ -6,6 +6,20 @@ the preview period, minor releases may intentionally revise public APIs.
 
 ## [Unreleased]
 
+## [0.9.0-preview.5] - 2026-07-21
+
+### Added
+
+- Add explicit `DangerouslySkipServerCertificateValidation` support for controlled
+  testing while retaining CertificateVerify/server-key signatures, Finished and record
+  authentication. Resumption caches partition validated and bypassed sessions.
+
+### Fixed
+
+- Soft-fail only unavailable online/offline revocation evidence by default after a second
+  no-revocation PKIX build, while keeping actual revocation and every other
+  certificate failure fatal. Strict revocation-availability enforcement remains opt-in.
+
 ## [0.9.0-preview.4] - 2026-07-18
 
 ### Fixed

@@ -258,10 +258,17 @@ public sealed class ProtectedDnsTransportTests
                 {
                     ResolverName = "RESOLVER.example.",
                     BootstrapEndpoints = [endpoint],
+                    CertificateValidation = new CustomTlsCertificateValidationOptions
+                    {
+                        DangerouslySkipServerCertificateValidation = true,
+                        AllowUnknownRevocationStatus = false,
+                    },
                 },
             }.Snapshot().ProtectedTransport);
         Assert.Equal("resolver.example", dot.ResolverName);
         Assert.Equal(853, Assert.Single(dot.BootstrapEndpoints).Port);
+        Assert.False(dot.CertificateValidation.AllowUnknownRevocationStatus);
+        Assert.True(dot.CertificateValidation.DangerouslySkipServerCertificateValidation);
 
         var doh = Assert.IsType<DnsOverHttpsConfiguration>(
             new TlsEchDnsResolverOptions

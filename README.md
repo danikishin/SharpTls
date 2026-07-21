@@ -41,7 +41,7 @@ libraries, P/Invoke, proxies, external processes, or another TLS implementation.
 
 Every executable profile still goes through SharpTls's authentication and state-machine
 checks. Wire fidelity never silently disables certificate validation or weakens the
-secure TLS policy.
+secure TLS policy; an explicitly named dangerous opt-in is available for controlled labs.
 
 ## Install
 
@@ -208,7 +208,7 @@ secrets.
 | P-256, P-384, P-521, X25519 | Implemented |
 | X25519MLKEM768 | Implemented; independent cryptographic audit remains a 1.0 gate |
 | RSA-PSS, constrained RSA-PSS keys, ECDSA | Implemented |
-| System chain + hostname validation | Implemented and fail-closed |
+| System chain + hostname validation | Secure by default; trust, identity and known revocation fail closed, unavailable revocation evidence has configurable soft/hard failure, and an explicit dangerous lab-only bypass is available |
 | HRR, session resumption, external PSK, 0-RTT, KeyUpdate, exporters | Implemented |
 | RFC 9849 ECH + RFC 9848 discovery | Implemented for standard and recordless QUIC-TLS roles |
 | Client certificates, delegated credentials, OCSP/SCT policy, certificate compression | Implemented |
@@ -280,6 +280,7 @@ dotnet run --project benchmarks/SharpTls.Benchmarks/SharpTls.Benchmarks.csproj \
 | Import a capture or round-trip JSON | [Capture import and JSON](docs/CLIENTHELLO-IMPORT.md) |
 | Generate coherent fingerprints or use Roller | [Randomization and Roller](docs/RANDOMIZATION.md) |
 | Configure resumption, PSK or replay-aware 0-RTT | [Resumption and early data](docs/RESUMPTION-EARLY-DATA.md) |
+| Configure revocation, OCSP/CT or the dangerous lab-only trust bypass | [Certificate validation and evidence](docs/CERTIFICATE-EVIDENCE.md) |
 | Configure ECH and HTTPS/SVCB discovery | [Encrypted ClientHello](docs/ENCRYPTED-CLIENT-HELLO.md) and [ECH DNS bootstrap](docs/ECH-DNS-BOOTSTRAP.md) |
 | Host a managed TLS endpoint | [Server engine](docs/SERVER-ENGINE.md) |
 | Integrate TLS with a QUIC transport | [QUIC-TLS adapter](docs/QUIC-TLS.md) |

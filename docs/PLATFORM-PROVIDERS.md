@@ -20,7 +20,7 @@ components and the release gate applied when a primitive is unavailable.
 | X25519Kyber768Draft00 | managed compatibility construction | none | Kept separate from the standards-track hybrid group and tested against its accumulated vectors. |
 | ECH HPKE NIST KEMs | .NET ECDH plus managed RFC 9180 labeling | none | Each curve is probed; unsupported configurations are skipped rather than partially executed. |
 | ECH HPKE X25519 | managed X25519 plus .NET AEAD/HMAC | none | KEM, KDF and AEAD must all be executable before config selection. |
-| X.509 parsing and PKIX | `X509Certificate2` / `X509Chain` | none | System trust is always required; SharpTls adds RFC 9525 identity and TLS signature checks. |
+| X.509 parsing and PKIX | `X509Certificate2` / `X509Chain` | none | System trust is always required; known revocation is fatal, unavailable revocation evidence has configurable soft/hard failure, and SharpTls adds RFC 9525 identity and TLS signature checks. |
 | Zlib/Brotli certificate compression | `ZLibStream` / `BrotliStream` | none | Offered-only selection plus compressed and decompressed size bounds. |
 | Entropy | `RandomNumberGenerator` | none in production | The deterministic source is reachable only through explicit test/snapshot APIs. |
 

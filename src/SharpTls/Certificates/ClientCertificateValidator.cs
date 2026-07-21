@@ -36,7 +36,7 @@ internal static class ClientCertificateValidator
             chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
             chain.ChainPolicy.CustomTrustStore.AddRange(roots);
         }
-        if (!chain.Build(message.Leaf))
+        if (!CertificateChainBuilder.Build(chain, message.Leaf, policy))
         {
             if (chain.ChainStatus.Any(status =>
                 (status.Status & X509ChainStatusFlags.Revoked) != 0))

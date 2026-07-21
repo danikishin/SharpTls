@@ -19,7 +19,8 @@ public enum TlsStapledOcspValidationStatus
 
 /// <summary>
 /// Immutable defensive input for an additional OCSP/Certificate Transparency policy.
-/// Normal chain and hostname validation has already succeeded and cannot be bypassed.
+/// Normal chain and hostname validation has already succeeded unless the caller explicitly
+/// enabled <see cref="CustomTlsCertificateValidationOptions.DangerouslySkipServerCertificateValidation"/>.
 /// </summary>
 public sealed class TlsServerCertificateEvidence
 {
@@ -43,7 +44,7 @@ public sealed class TlsServerCertificateEvidence
         _signedCertificateTimestamps = CloneJagged(signedCertificateTimestamps);
     }
 
-    /// <summary>Gets the certificate reference identity that was already hostname-validated.</summary>
+    /// <summary>Gets the configured certificate reference identity.</summary>
     public string ServerName { get; }
 
     /// <summary>Gets the negotiated TLS version.</summary>
@@ -96,8 +97,9 @@ public sealed record TlsServerCertificateEvidenceValidationResult
 }
 
 /// <summary>
-/// Adds deployment-specific OCSP and CT validation after mandatory system X.509 and
-/// hostname validation. Completion never overrides a system validation failure.
+/// Adds deployment-specific OCSP and CT validation. Completion never overrides a system
+/// validation failure; the callback still runs when the caller explicitly bypasses system
+/// chain and hostname validation.
 /// </summary>
 public delegate ValueTask<TlsServerCertificateEvidenceValidationResult>
     TlsServerCertificateEvidenceValidator(

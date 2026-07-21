@@ -150,6 +150,84 @@ public sealed class CustomTlsServerInteropTests
     [Theory]
     [InlineData(TlsProtocolVersion.Tls13)]
     [InlineData(TlsProtocolVersion.Tls12)]
+    public async Task DangerousCertificateBypassCompletesOtherwiseUntrustedHandshake(
+        TlsProtocolVersion version)
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        using var pki = TestPki.Create(dnsName: "certificate.example");
+        using var credential = new TlsServerCertificate(
+            pki.Leaf,
+            (RSA)pki.LeafKey,
+            [pki.Root]);
+        using var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start(1);
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        var serverTask = Task.Run(async () =>
+        {
+            using var socket = await listener.AcceptSocketAsync(timeout.Token);
+            await using var server = new CustomTlsServer(new CustomTlsServerOptions
+            {
+                ServerCertificate = credential,
+                SupportedVersions = [version],
+                CipherSuites = [TlsCipherSuite.TlsAes128GcmSha256],
+                Tls12CipherSuites = [TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256],
+                SupportedGroups = [NamedGroup.Secp256r1],
+            });
+            await server.AuthenticateAsync(socket, ownsSocket: true, timeout.Token);
+            Assert.Equal(
+                "dangerous-mode-ping"u8.ToArray(),
+                await server.ReadApplicationDataAsync(timeout.Token));
+        }, timeout.Token);
+
+        var profile = version == TlsProtocolVersion.Tls13
+            ? ClientHelloProfiles.Custom(builder => builder
+                .WithTls13()
+                .WithCipherSuites(TlsCipherSuite.TlsAes128GcmSha256)
+                .WithSupportedGroups(NamedGroup.Secp256r1)
+                .WithKeyShares(NamedGroup.Secp256r1))
+            : ClientHelloProfiles.Custom(builder => builder
+                .WithLegacyTls12ClientHello()
+                .WithCipherSuites(TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256)
+                .WithSupportedGroups(NamedGroup.Secp256r1)
+                .WithSignatureAlgorithms(
+                    SignatureScheme.RsaPssRsaeSha256,
+                    SignatureScheme.RsaPkcs1Sha256)
+                .WithExtensionLayout(
+                    ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.ServerName),
+                    ClientHelloExtensionSpec.Raw(
+                        (ushort)TlsExtensionType.ExtendedMasterSecret,
+                        []),
+                    ClientHelloExtensionSpec.Raw(
+                        (ushort)TlsExtensionType.RenegotiationInfo,
+                        [0]),
+                    ClientHelloExtensionSpec.BuiltIn(ClientHelloExtensionKind.SupportedGroups),
+                    ClientHelloExtensionSpec.Raw(
+                        (ushort)TlsExtensionType.EcPointFormats,
+                        [1, 0]),
+                    ClientHelloExtensionSpec.BuiltIn(
+                        ClientHelloExtensionKind.SignatureAlgorithms)));
+        await using var client = new CustomTlsClient(new CustomTlsClientOptions
+        {
+            ServerName = "wrong.example",
+            ClientHello = profile,
+            CertificateValidation = new CustomTlsCertificateValidationOptions
+            {
+                DangerouslySkipServerCertificateValidation = true,
+            },
+        });
+
+        await client.ConnectAsync(IPAddress.Loopback.ToString(), port, timeout.Token);
+        Assert.Equal(version, client.NegotiatedProtocolVersion);
+        Assert.True(client.GetConnectionState().ServerCertificateValidationSkipped);
+        await client.WriteApplicationDataAsync(
+            "dangerous-mode-ping"u8.ToArray(),
+            timeout.Token);
+        await serverTask.WaitAsync(timeout.Token);
+    }
+
+    [Theory]
+    [InlineData(TlsProtocolVersion.Tls13)]
+    [InlineData(TlsProtocolVersion.Tls12)]
     public async Task ServerStapledOcspAndSctsAreAuthenticatedWhenRequested(
         TlsProtocolVersion version)
     {

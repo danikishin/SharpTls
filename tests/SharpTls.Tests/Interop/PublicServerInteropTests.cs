@@ -33,10 +33,7 @@ public sealed class PublicServerInteropTests
             {
                 try
                 {
-                    await using var client = await ConnectAsync(
-                        profile,
-                        host,
-                        disableRevocationForEndpoint: host == "www.cloudflare.com");
+                    await using var client = await ConnectAsync(profile, host);
                     Assert.True(client.IsConnected, $"{propertyName} did not authenticate {host}.");
                     Assert.Contains(
                         client.NegotiatedProtocolVersion!.Value,
@@ -116,6 +113,18 @@ public sealed class PublicServerInteropTests
                 TlsCipherSuite.TlsAes256GcmSha384,
                 TlsCipherSuite.TlsChaCha20Poly1305Sha256,
             });
+    }
+
+    [InteropFact]
+    [Trait("Category", "Interop")]
+    public async Task Chrome133AuthenticatesKickWithDefaultRevocationPolicy()
+    {
+        await using var client = await ConnectAsync(
+            ClientHelloProfiles.UTlsChrome133,
+            "kick.com");
+
+        Assert.True(client.IsConnected);
+        Assert.Equal(TlsProtocolVersion.Tls13, client.NegotiatedProtocolVersion);
     }
 
     [InteropFact]

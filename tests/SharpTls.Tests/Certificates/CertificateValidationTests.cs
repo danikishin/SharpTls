@@ -59,6 +59,81 @@ public sealed class CertificateValidationTests
     }
 
     [Fact]
+    public void DangerousBypassSkipsTrustAndHostnameButNotCertificateVerify()
+    {
+        using var pki = TestPki.Create(dnsName: "other.example");
+        using var otherPki = TestPki.Create();
+        using var message = ParseCertificateMessage(pki.Leaf, pki.Root);
+        var policy = CustomTrust(otherPki.Root) with
+        {
+            DangerouslySkipServerCertificateValidation = true,
+        };
+
+        ServerCertificateValidator.ValidateChainAndHostname(
+            message,
+            "example.com",
+            policy);
+
+        var transcriptHash = SHA256.HashData([1, 2, 3]);
+        var exception = Assert.Throws<TlsProtocolException>(() =>
+            ServerCertificateValidator.ParseAndVerifyCertificateVerify(
+                EncodeCertificateVerify(
+                    SignatureScheme.RsaPssRsaeSha256,
+                    new byte[pki.LeafKey.KeySize / 8]),
+                pki.Leaf,
+                [SignatureScheme.RsaPssRsaeSha256],
+                transcriptHash));
+        Assert.Equal(TlsAlertDescription.DecryptError, exception.Alert);
+    }
+
+    [Fact]
+    public void RevocationSoftFailAcceptsOnlyUnavailableEvidenceStatuses()
+    {
+        var softFail = new CertificateValidationPolicy(
+            X509RevocationMode.Online,
+            X509RevocationFlag.ExcludeRoot,
+            DisableCertificateDownloads: false,
+            TimeSpan.FromSeconds(1),
+            CustomTrustRoots: null,
+            AllowUnknownRevocationStatus: true);
+        var hardFail = softFail with { AllowUnknownRevocationStatus = false };
+        var noCheck = softFail with { RevocationMode = X509RevocationMode.NoCheck };
+        X509ChainStatus[] unavailable =
+        [
+            ChainStatus(X509ChainStatusFlags.RevocationStatusUnknown),
+            ChainStatus(X509ChainStatusFlags.OfflineRevocation),
+        ];
+
+        Assert.True(CertificateChainBuilder.ContainsOnlyUnavailableRevocationStatus(
+            unavailable));
+        Assert.True(CertificateChainBuilder.ShouldRetryWithoutRevocation(
+            softFail,
+            unavailable));
+        Assert.False(CertificateChainBuilder.ShouldRetryWithoutRevocation(
+            hardFail,
+            unavailable));
+        Assert.False(CertificateChainBuilder.ShouldRetryWithoutRevocation(
+            noCheck,
+            unavailable));
+        Assert.False(CertificateChainBuilder.ContainsOnlyUnavailableRevocationStatus([]));
+        Assert.False(CertificateChainBuilder.ContainsOnlyUnavailableRevocationStatus(
+        [
+            ChainStatus(X509ChainStatusFlags.Revoked),
+        ]));
+        Assert.False(CertificateChainBuilder.ContainsOnlyUnavailableRevocationStatus(
+        [
+            ChainStatus(
+                X509ChainStatusFlags.RevocationStatusUnknown |
+                X509ChainStatusFlags.NotTimeValid),
+        ]));
+        Assert.False(CertificateChainBuilder.ContainsOnlyUnavailableRevocationStatus(
+        [
+            ChainStatus(X509ChainStatusFlags.UntrustedRoot),
+            ChainStatus(X509ChainStatusFlags.RevocationStatusUnknown),
+        ]));
+    }
+
+    [Fact]
     public void WrongExtendedKeyUsageIsRejected()
     {
         using var pki = TestPki.Create(serverAuthenticationEku: false);
@@ -308,6 +383,11 @@ public sealed class CertificateValidationTests
         DisableCertificateDownloads: true,
         TimeSpan.Zero,
         new X509Certificate2Collection(root));
+
+    private static X509ChainStatus ChainStatus(X509ChainStatusFlags flags) => new()
+    {
+        Status = flags,
+    };
 
     private static byte[] Sign(AsymmetricAlgorithm key, byte[] content, bool ecdsa) => ecdsa
         ? ((ECDsa)key).SignData(

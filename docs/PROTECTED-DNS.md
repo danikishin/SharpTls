@@ -15,17 +15,23 @@ falls back to port 53. `AllowDirectFallbackOnDnsError` governs the later origin/
 it does not downgrade the resolver transport.
 
 System trust is the default. `CertificateValidation` supports the same revocation and
-custom-root policy as an ordinary `CustomTlsClient`. A bootstrap environment that disables
-certificate downloads or online revocation should supply a deliberate policy, because
-performing those lookups can otherwise create another name-resolution dependency.
+custom-root policy as an ordinary `CustomTlsClient`. Online revocation is attempted by
+default, while unavailable evidence soft-fails unless `AllowUnknownRevocationStatus` is
+disabled. A bootstrap environment that disables certificate downloads or revocation
+lookups should supply a deliberate policy, because performing those lookups can otherwise
+create another name-resolution dependency.
+
+The shared `DangerouslySkipServerCertificateValidation` option is also available for
+controlled tests, but enabling it removes resolver authentication and therefore violates
+the strict DoT/DoH security model described here. It is never enabled implicitly.
 
 ## DNS-over-TLS
 
 RFC 7858 uses TCP port 853, completes TLS before sending DNS, and frames every DNS message
 with a two-octet length. RFC 8310 strict privacy requires an authenticated encrypted channel
-and forbids opportunistic plaintext fallback. SharpTls enforces TLS 1.3, semantic SNI, no
-ALPN, strict certificate validation, partial-read handling, and the configured DNS message
-bound.
+and forbids opportunistic plaintext fallback. By default SharpTls enforces TLS 1.3,
+semantic SNI, no ALPN, strict certificate validation, partial-read handling, and the
+configured DNS message bound.
 
 ```csharp
 var resolver = new TlsEchDnsResolver(new TlsEchDnsResolverOptions

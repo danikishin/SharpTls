@@ -33,7 +33,7 @@ public sealed class CustomTlsQuicClientOptions
     /// <summary>Gets or sets defensive parser and transcript limits.</summary>
     public TlsLimits Limits { get; set; } = TlsLimits.Default;
 
-    /// <summary>Gets or sets mandatory system X.509 and hostname validation policy.</summary>
+    /// <summary>Gets or sets the server X.509 and reference-identity validation policy.</summary>
     public CustomTlsCertificateValidationOptions CertificateValidation { get; set; } = new();
 
     /// <summary>Gets or sets a static client credential for initial client authentication.</summary>

@@ -185,7 +185,7 @@ public sealed class Tls13SessionCache : IDisposable
             try
             {
                 writer.WriteBytes("ST13"u8);
-                writer.WriteUInt8(3);
+                writer.WriteUInt8(4);
                 writer.WriteUInt16((ushort)_tickets.Count);
                 foreach (var ticket in _tickets)
                 {
@@ -356,7 +356,7 @@ public sealed class Tls13SessionCache : IDisposable
         var alpnLength = ticket.NegotiatedAlpn?.Length ?? 0;
         return checked(
             2 + ticket.Origin.Host.Length +
-            2 + 2 +
+            2 + 1 + 2 +
             1 + alpnLength +
             4 +
             2 + ticket.Identity.Length +
@@ -378,6 +378,7 @@ public sealed class Tls13SessionCache : IDisposable
     {
         writer.WriteVector16(Encoding.ASCII.GetBytes(ticket.Origin.Host));
         writer.WriteUInt16((ushort)(ticket.Origin.Port ?? 0));
+        writer.WriteUInt8(ticket.Origin.CertificateValidationSkipped ? (byte)1 : (byte)0);
         writer.WriteUInt16((ushort)ticket.CipherSuite);
         writer.WriteVector8(ticket.NegotiatedAlpn is null
             ? ReadOnlySpan<byte>.Empty
@@ -435,7 +436,7 @@ public sealed class Tls13SessionCache : IDisposable
                 throw new InvalidDataException("The TLS session state has an invalid format marker.");
             }
             var stateVersion = reader.ReadUInt8();
-            if (stateVersion is not (1 or 2 or 3))
+            if (stateVersion is not (1 or 2 or 3 or 4))
             {
                 throw new InvalidDataException("The TLS session state version is unsupported.");
             }
@@ -451,7 +452,21 @@ public sealed class Tls13SessionCache : IDisposable
             {
                 var host = ReadAscii(reader.ReadVector16(255), allowEmpty: false, "origin host");
                 var encodedPort = reader.ReadUInt16();
-                var origin = Tls13SessionOrigin.Create(host, encodedPort == 0 ? null : encodedPort);
+                var certificateValidationSkipped = false;
+                if (stateVersion >= 4)
+                {
+                    var encodedValidationMode = reader.ReadUInt8();
+                    if (encodedValidationMode > 1)
+                    {
+                        throw new InvalidDataException(
+                            "The TLS session state has an invalid certificate-validation mode.");
+                    }
+                    certificateValidationSkipped = encodedValidationMode == 1;
+                }
+                var origin = Tls13SessionOrigin.Create(
+                    host,
+                    encodedPort == 0 ? null : encodedPort,
+                    certificateValidationSkipped);
                 var cipherSuite = (TlsCipherSuite)reader.ReadUInt16();
                 _ = CipherSuiteInfo.Get(cipherSuite);
                 var alpnBytes = reader.ReadVector8();
@@ -659,9 +674,15 @@ public sealed class Tls13SessionCache : IDisposable
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 }
 
-internal readonly record struct Tls13SessionOrigin(string Host, int? Port)
+internal readonly record struct Tls13SessionOrigin(
+    string Host,
+    int? Port,
+    bool CertificateValidationSkipped)
 {
-    internal static Tls13SessionOrigin Create(string referenceIdentity, int? port)
+    internal static Tls13SessionOrigin Create(
+        string referenceIdentity,
+        int? port,
+        bool certificateValidationSkipped = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(referenceIdentity);
         if (port is < 1 or > ushort.MaxValue)
@@ -675,7 +696,7 @@ internal readonly record struct Tls13SessionOrigin(string Host, int? Port)
         host = IPAddress.TryParse(host, out var address)
             ? address.ToString()
             : new IdnMapping().GetAscii(host).ToLowerInvariant();
-        return new Tls13SessionOrigin(host, port);
+        return new Tls13SessionOrigin(host, port, certificateValidationSkipped);
     }
 }
 

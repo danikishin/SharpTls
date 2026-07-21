@@ -256,8 +256,11 @@ public sealed class ClientHelloProfileRoller
             Limits = template.Limits with { },
             CertificateValidation = new CustomTlsCertificateValidationOptions
             {
+                DangerouslySkipServerCertificateValidation =
+                    certificate.DangerouslySkipServerCertificateValidation,
                 RevocationMode = certificate.RevocationMode,
                 RevocationFlag = certificate.RevocationFlag,
+                AllowUnknownRevocationStatus = certificate.AllowUnknownRevocationStatus,
                 DisableCertificateDownloads = certificate.DisableCertificateDownloads,
                 UrlRetrievalTimeout = certificate.UrlRetrievalTimeout,
                 CustomTrustRoots = certificate.CustomTrustRoots?.ToArray(),

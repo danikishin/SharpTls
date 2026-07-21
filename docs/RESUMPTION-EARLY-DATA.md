@@ -30,11 +30,12 @@ Console.WriteLine(resumed.SessionWasResumed);
 ```
 
 The cache is bounded and thread-safe. It binds tickets to the normalized reference
-identity, port, negotiated ALPN, and compatible TLS 1.3 transcript hash. Tickets are
-removed atomically when offered, are never offered twice by the cache, expire no later
-than seven days, and cannot extend the authentication lifetime of the original
-certificate handshake. Eviction, clearing, disposal, and failed offers zeroize owned
-ticket identities and PSKs.
+identity, port, certificate-validation mode, negotiated ALPN, and compatible TLS 1.3
+transcript hash. A ticket learned with the explicit dangerous certificate bypass is
+never offered by a default validated client, or vice versa. Tickets are removed atomically
+when offered, are never offered twice by the cache, expire no later than seven days, and
+cannot extend the authentication lifetime of the original certificate handshake.
+Eviction, clearing, disposal, and failed offers zeroize owned ticket identities and PSKs.
 
 Tickets created by an accepted ECH handshake are additionally bound to the SHA-256 hash
 of the exact bootstrapping `ECHConfigList`. They are never offered by a non-ECH connection
@@ -73,7 +74,9 @@ secret store and must not reuse them for another protocol.
 Tickets issued after experimental ALPS/application_settings negotiation additionally
 persist the code point and byte-exact authenticated peer/client settings. Such a ticket
 is offered only when the configured client settings still match. Older persisted state
-without this binding remains readable but cannot authorize ALPS-associated 0-RTT.
+without this binding remains readable but cannot authorize ALPS-associated 0-RTT. State
+written before validation-mode binding remains readable as validated-mode state and can
+never enter the dangerous bypass partition implicitly.
 
 `ModernTls13` and the TLS-1.3-capable pinned uTLS profiles contain conditional PSK
 slots. With no cached ticket, `early_data` and `pre_shared_key` are omitted and the

@@ -299,6 +299,8 @@ T: public sealed class SharpTls.ClientHelloSpecJsonOptions
 T: public sealed class SharpTls.CustomTlsCertificateValidationOptions
   C: public SharpTls.CustomTlsCertificateValidationOptions()
   P: public SharpTls.Certificates.TlsServerCertificateEvidenceValidator? EvidenceValidator { get; set; }
+  P: public System.Boolean AllowUnknownRevocationStatus { get; set; }
+  P: public System.Boolean DangerouslySkipServerCertificateValidation { get; set; }
   P: public System.Boolean DisableCertificateDownloads { get; set; }
   P: public System.Boolean RequireValidStapledOcspResponse { get; set; }
   P: public System.Collections.Generic.IReadOnlyCollection<System.Security.Cryptography.X509Certificates.X509Certificate2>? CustomTrustRoots { get; set; }
@@ -327,6 +329,7 @@ T: public sealed class SharpTls.CustomTlsClient : SharpTls.IApplicationDataTrans
   P: public System.Boolean ExternalPskWasSelected { get; }
   P: public System.Boolean HandshakeUsedHelloRetryRequest { get; }
   P: public System.Boolean IsConnected { get; }
+  P: public System.Boolean ServerCertificateValidationSkipped { get; }
   P: public System.Boolean ServerUsedDelegatedCredential { get; }
   P: public System.Boolean SessionWasResumed { get; }
   P: public System.Byte[]? NegotiatedPeerApplicationSettings { get; }
@@ -584,6 +587,7 @@ T: public sealed class SharpTls.Quic.CustomTlsQuicClient : System.IAsyncDisposab
   P: public System.Boolean EncryptedClientHelloAccepted { get; }
   P: public System.Boolean HandshakeUsedHelloRetryRequest { get; }
   P: public System.Boolean IsHandshakeComplete { get; }
+  P: public System.Boolean ServerCertificateValidationSkipped { get; }
   P: public System.Boolean SessionWasResumed { get; }
   P: public System.Collections.Generic.IReadOnlyList<System.Byte[]> PeerCertificateChain { get; }
   P: public System.String? NegotiatedApplicationProtocol { get; }
@@ -819,6 +823,7 @@ T: public sealed class SharpTls.TlsConnectionState
   P: public System.Boolean GreaseEncryptedClientHelloOffered { get; }
   P: public System.Boolean LocalClosed { get; }
   P: public System.Boolean PeerClosed { get; }
+  P: public System.Boolean ServerCertificateValidationSkipped { get; }
   P: public System.Boolean ServerUsedDelegatedCredential { get; }
   P: public System.Boolean SessionWasResumed { get; }
   P: public System.Boolean UsedHelloRetryRequest { get; }

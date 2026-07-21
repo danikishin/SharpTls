@@ -20,7 +20,7 @@ public sealed class TlsEchDnsOverTlsOptions
     public ClientHelloProfile ClientHello { get; set; } =
         ClientHelloProfiles.Custom(builder => builder.WithTls13());
 
-    /// <summary>Gets or sets strict resolver-certificate validation policy.</summary>
+    /// <summary>Gets or sets the resolver-certificate validation policy.</summary>
     public CustomTlsCertificateValidationOptions CertificateValidation { get; set; } = new();
 
     internal DnsOverTlsConfiguration Snapshot()
@@ -67,7 +67,7 @@ public sealed class TlsEchDnsOverHttpsOptions
     public ClientHelloProfile ClientHello { get; set; } = ClientHelloProfiles.Custom(
         builder => builder.WithTls13().WithAlpn("http/1.1"));
 
-    /// <summary>Gets or sets strict resolver-certificate validation policy.</summary>
+    /// <summary>Gets or sets the resolver-certificate validation policy.</summary>
     public CustomTlsCertificateValidationOptions CertificateValidation { get; set; } = new();
 
     /// <summary>Gets or sets the maximum accepted HTTP response-header byte count.</summary>
@@ -218,8 +218,10 @@ internal static class DnsProtectedTransportValidation
 }
 
 internal sealed record DnsCertificateValidationConfiguration(
+    bool DangerouslySkipServerCertificateValidation,
     X509RevocationMode RevocationMode,
     X509RevocationFlag RevocationFlag,
+    bool AllowUnknownRevocationStatus,
     bool DisableCertificateDownloads,
     TimeSpan UrlRetrievalTimeout,
     byte[][] CustomTrustRoots)
@@ -238,8 +240,10 @@ internal sealed record DnsCertificateValidationConfiguration(
             return root.RawData;
         }).ToArray() ?? [];
         return new DnsCertificateValidationConfiguration(
+            options.DangerouslySkipServerCertificateValidation,
             options.RevocationMode,
             options.RevocationFlag,
+            options.AllowUnknownRevocationStatus,
             options.DisableCertificateDownloads,
             options.UrlRetrievalTimeout,
             roots);
@@ -252,8 +256,11 @@ internal sealed record DnsCertificateValidationConfiguration(
             X509CertificateLoader.LoadCertificate).ToArray();
         return new CustomTlsCertificateValidationOptions
         {
+            DangerouslySkipServerCertificateValidation =
+                DangerouslySkipServerCertificateValidation,
             RevocationMode = RevocationMode,
             RevocationFlag = RevocationFlag,
+            AllowUnknownRevocationStatus = AllowUnknownRevocationStatus,
             DisableCertificateDownloads = DisableCertificateDownloads,
             UrlRetrievalTimeout = UrlRetrievalTimeout,
             CustomTrustRoots = temporaryRoots,

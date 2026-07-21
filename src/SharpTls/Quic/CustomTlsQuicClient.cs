@@ -97,7 +97,12 @@ public sealed class CustomTlsQuicClient : IAsyncDisposable
     /// <summary>Gets the outcome of explicitly enabled replayable QUIC 0-RTT.</summary>
     public Tls13EarlyDataStatus EarlyDataStatus { get; private set; }
 
-    /// <summary>Gets defensive DER copies of the authenticated server chain.</summary>
+    /// <summary>Gets whether the explicit dangerous option bypassed server PKI/name validation.</summary>
+    public bool ServerCertificateValidationSkipped =>
+        _configuration.Shared.CertificateValidation
+            .DangerouslySkipServerCertificateValidation;
+
+    /// <summary>Gets defensive DER copies of the peer-provided server chain.</summary>
     public IReadOnlyList<byte[]> PeerCertificateChain => Array.AsReadOnly(
         _peerCertificateChain.Select(value => (byte[])value.Clone()).ToArray());
 
@@ -122,7 +127,9 @@ public sealed class CustomTlsQuicClient : IAsyncDisposable
                 _offeredTicket = cache.TryTake(
                     Tls13SessionOrigin.Create(
                         _configuration.ServerName,
-                        _configuration.ServerPort),
+                        _configuration.ServerPort,
+                        _configuration.Shared.CertificateValidation
+                            .DangerouslySkipServerCertificateValidation),
                     _configuration.ClientHello.Spec.CipherSuites,
                     _configuration.ClientHello.Spec.AlpnProtocols,
                     _configuration.Shared.Ech?.ConfigListHash);
@@ -925,7 +932,9 @@ public sealed class CustomTlsQuicClient : IAsyncDisposable
             cache.Add(new Tls13SessionTicket(
                 Tls13SessionOrigin.Create(
                     _configuration.ServerName,
-                    _configuration.ServerPort),
+                    _configuration.ServerPort,
+                    _configuration.Shared.CertificateValidation
+                        .DangerouslySkipServerCertificateValidation),
                 NegotiatedCipherSuite!.Value,
                 NegotiatedApplicationProtocol,
                 ticket.AgeAdd,

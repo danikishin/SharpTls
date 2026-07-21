@@ -137,6 +137,10 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
     /// <summary>Gets whether TLS 1.3 server authentication used an RFC 9345 credential.</summary>
     public bool ServerUsedDelegatedCredential { get; private set; }
 
+    /// <summary>Gets whether the explicit dangerous option bypasses server PKI/name validation.</summary>
+    public bool ServerCertificateValidationSkipped =>
+        _configuration.CertificateValidation.DangerouslySkipServerCertificateValidation;
+
     /// <summary>Gets the authenticated delegated credential expiry, when one was used.</summary>
     public DateTimeOffset? ServerDelegatedCredentialExpiresAt { get; private set; }
 
@@ -160,6 +164,7 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
             HandshakeUsedHelloRetryRequest,
             SessionWasResumed,
             ExternalPskWasSelected,
+            _configuration.CertificateValidation.DangerouslySkipServerCertificateValidation,
             EarlyDataStatus,
             _configuration.Ech is not null,
             EncryptedClientHelloAccepted,
@@ -208,7 +213,7 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
             .ExportKeyingMaterial(label, context, outputLength);
     }
 
-    /// <summary>Connects TCP and performs the configured authenticated TLS handshake.</summary>
+    /// <summary>Connects TCP and performs the configured TLS handshake.</summary>
     public async ValueTask ConnectAsync(
         string host,
         int port,
@@ -241,7 +246,11 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
             InitializeTransportState();
 
             var referenceIdentity = _configuration.ServerName ?? host;
-            _sessionOrigin = Tls13SessionOrigin.Create(referenceIdentity, port);
+            _sessionOrigin = Tls13SessionOrigin.Create(
+                referenceIdentity,
+                port,
+                _configuration.CertificateValidation
+                    .DangerouslySkipServerCertificateValidation);
             await PerformHandshakeAsync(referenceIdentity, cancellationToken).ConfigureAwait(false);
         }
         catch
@@ -255,7 +264,8 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
     /// <summary>
     /// Performs TLS over an already-connected caller-provided duplex stream.
     /// The reference identity is used for SNI and certificate validation unless
-    /// <see cref="CustomTlsClientOptions.ServerName"/> overrides it.
+    /// <see cref="CustomTlsClientOptions.ServerName"/> overrides it or certificate
+    /// validation is explicitly bypassed.
     /// </summary>
     public async ValueTask AuthenticateAsync(
         Stream transport,
@@ -287,7 +297,11 @@ public sealed class CustomTlsClient : IAsyncDisposable, IApplicationDataTranspor
             cancellationToken.ThrowIfCancellationRequested();
             InitializeTransportState();
             var effectiveIdentity = _configuration.ServerName ?? referenceIdentity;
-            _sessionOrigin = Tls13SessionOrigin.Create(effectiveIdentity, port: null);
+            _sessionOrigin = Tls13SessionOrigin.Create(
+                effectiveIdentity,
+                port: null,
+                _configuration.CertificateValidation
+                    .DangerouslySkipServerCertificateValidation);
             await PerformHandshakeAsync(effectiveIdentity, cancellationToken).ConfigureAwait(false);
         }
         catch

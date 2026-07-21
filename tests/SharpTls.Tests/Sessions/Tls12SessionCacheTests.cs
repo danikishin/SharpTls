@@ -65,6 +65,32 @@ public sealed class Tls12SessionCacheTests
     }
 
     [Fact]
+    public void CacheSeparatesValidatedAndDangerouslyUnvalidatedOrigins()
+    {
+        var now = new DateTimeOffset(2026, 7, 21, 12, 0, 0, TimeSpan.Zero);
+        var clock = new ManualTimeProvider(now);
+        using var cache = new Tls12SessionCache(2, TimeSpan.FromHours(1), clock);
+        var unvalidatedOrigin = Tls13SessionOrigin.Create(
+            "example.com",
+            443,
+            certificateValidationSkipped: true);
+        cache.Add(CreateSession(
+            unvalidatedOrigin,
+            [1],
+            new byte[48],
+            now.AddMinutes(30),
+            null));
+
+        Assert.Null(cache.TryGet(
+            Tls13SessionOrigin.Create("example.com", 443),
+            [TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256]));
+        using var unvalidated = cache.TryGet(
+            unvalidatedOrigin,
+            [TlsCipherSuite.TlsEcdheRsaWithAes128GcmSha256]);
+        Assert.NotNull(unvalidated);
+    }
+
+    [Fact]
     public void CacheRejectsInvalidBoundsAndSessionSecrets()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new Tls12SessionCache(0));

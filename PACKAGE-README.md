@@ -40,7 +40,9 @@ var bytesRead = await tls.ReadAsync(responseBuffer, cancellationToken);
 - Forty pinned upstream uTLS wire IDs, coherent randomization, bounded origin-aware
   Roller, capture import, strict JSON v6 and defensive pre-send inspection.
 - TLS 1.3 and a deliberately restricted TLS 1.2 client/server core.
-- System chain and hostname validation, RSA-PSS/ECDSA authentication, resumption,
+- System chain and hostname validation by default, explicit lab-only trust bypass,
+  configurable revocation-availability policy,
+  RSA-PSS/ECDSA authentication, resumption,
   external PSK, replay-gated 0-RTT, KeyUpdate, exporters and client certificates.
 - RFC 9849 ECH, RFC 9848 HTTPS/SVCB discovery, X25519MLKEM768, delegated credentials,
   certificate compression and recordless QUIC-TLS client/server adapters.

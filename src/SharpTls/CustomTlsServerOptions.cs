@@ -312,10 +312,12 @@ public sealed class CustomTlsServerOptions
         }
         if (ClientCertificateValidation.EvidenceValidator is not null ||
             ClientCertificateValidation.RequireValidStapledOcspResponse ||
-            ClientCertificateValidation.MinimumValidSignedCertificateTimestamps != 0)
+            ClientCertificateValidation.MinimumValidSignedCertificateTimestamps != 0 ||
+            ClientCertificateValidation.DangerouslySkipServerCertificateValidation)
         {
             throw new ArgumentException(
-                "Server-side client authentication does not consume server OCSP/SCT evidence options.",
+                "Server-side client authentication does not consume server-certificate " +
+                "bypass or server OCSP/SCT evidence options.",
                 nameof(ClientCertificateValidation));
         }
         if (ClientCertificateValidation.UrlRetrievalTimeout < TimeSpan.Zero)
@@ -368,7 +370,9 @@ public sealed class CustomTlsServerOptions
                 ClientCertificateValidation.RevocationFlag,
                 ClientCertificateValidation.DisableCertificateDownloads,
                 ClientCertificateValidation.UrlRetrievalTimeout,
-                roots);
+                roots,
+                AllowUnknownRevocationStatus:
+                    ClientCertificateValidation.AllowUnknownRevocationStatus);
 
             return new CustomTlsServerConfiguration(
                 ServerCertificate,

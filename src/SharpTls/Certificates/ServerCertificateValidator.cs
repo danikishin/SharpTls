@@ -20,6 +20,11 @@ internal static class ServerCertificateValidator
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName);
         ArgumentNullException.ThrowIfNull(policy);
 
+        if (policy.DangerouslySkipServerCertificateValidation)
+        {
+            return;
+        }
+
         using var chain = new X509Chain();
         chain.ChainPolicy.RevocationMode = policy.RevocationMode;
         chain.ChainPolicy.RevocationFlag = policy.RevocationFlag;
@@ -38,7 +43,7 @@ internal static class ServerCertificateValidator
             chain.ChainPolicy.CustomTrustStore.AddRange(roots);
         }
 
-        if (!chain.Build(message.Leaf))
+        if (!CertificateChainBuilder.Build(chain, message.Leaf, policy))
         {
             throw MapChainFailure(chain, message, policy);
         }
@@ -280,7 +285,7 @@ internal static class ServerCertificateValidator
         presentedChain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
         presentedChain.ChainPolicy.CustomTrustStore.Add(presentedRoot);
 
-        return presentedChain.Build(message.Leaf);
+        return CertificateChainBuilder.Build(presentedChain, message.Leaf, policy);
     }
 
     private static bool TerminatesAtCustomTrustRoot(

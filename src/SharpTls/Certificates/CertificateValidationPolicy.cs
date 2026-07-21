@@ -10,7 +10,9 @@ internal sealed record CertificateValidationPolicy(
     X509Certificate2Collection? CustomTrustRoots,
     TlsServerCertificateEvidenceValidator? EvidenceValidator = null,
     bool RequireValidStapledOcspResponse = false,
-    int MinimumValidSignedCertificateTimestamps = 0)
+    int MinimumValidSignedCertificateTimestamps = 0,
+    bool AllowUnknownRevocationStatus = true,
+    bool DangerouslySkipServerCertificateValidation = false)
 {
     internal static CertificateValidationPolicy SystemDefault { get; } = new(
         X509RevocationMode.Online,
@@ -20,5 +22,7 @@ internal sealed record CertificateValidationPolicy(
         CustomTrustRoots: null,
         EvidenceValidator: null,
         RequireValidStapledOcspResponse: false,
-        MinimumValidSignedCertificateTimestamps: 0);
+        MinimumValidSignedCertificateTimestamps: 0,
+        AllowUnknownRevocationStatus: true,
+        DangerouslySkipServerCertificateValidation: false);
 }

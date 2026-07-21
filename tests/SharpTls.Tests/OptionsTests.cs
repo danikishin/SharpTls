@@ -11,6 +11,16 @@ namespace SharpTls.Tests;
 public sealed class OptionsTests
 {
     [Fact]
+    public void DefaultRevocationPolicyAttemptsOnlineAndSoftFailsOnlyAvailability()
+    {
+        var policy = new CustomTlsCertificateValidationOptions();
+
+        Assert.Equal(X509RevocationMode.Online, policy.RevocationMode);
+        Assert.True(policy.AllowUnknownRevocationStatus);
+        Assert.False(policy.DangerouslySkipServerCertificateValidation);
+    }
+
+    [Fact]
     public void RequiredCertificateEvidenceIsValidatorAndOfferBound()
     {
         Assert.Throws<ArgumentException>(() => new CustomTlsClientOptions
@@ -87,7 +97,9 @@ public sealed class OptionsTests
             },
             CertificateValidation = new CustomTlsCertificateValidationOptions
             {
+                DangerouslySkipServerCertificateValidation = true,
                 RevocationMode = X509RevocationMode.NoCheck,
+                AllowUnknownRevocationStatus = false,
                 CustomTrustRoots = [pki.Root],
             },
             ClientHelloInspector = originalInspector,
@@ -97,12 +109,16 @@ public sealed class OptionsTests
         options.ServerName = "mutated.invalid";
         options.Limits = new TlsLimits();
         options.CertificateValidation.RevocationMode = X509RevocationMode.Online;
+        options.CertificateValidation.AllowUnknownRevocationStatus = true;
+        options.CertificateValidation.DangerouslySkipServerCertificateValidation = false;
         options.ClientHelloInspector = _ => throw new InvalidOperationException();
 
         Assert.Equal("example.com", snapshot.ServerName);
         Assert.Equal(2_048, snapshot.HandshakeFragmentation.MaximumFragmentSize);
         Assert.Equal(2 * 1024 * 1024, snapshot.Limits.MaxHandshakeMessageSize);
         Assert.Equal(X509RevocationMode.NoCheck, snapshot.CertificateValidation.RevocationMode);
+        Assert.False(snapshot.CertificateValidation.AllowUnknownRevocationStatus);
+        Assert.True(snapshot.CertificateValidation.DangerouslySkipServerCertificateValidation);
         Assert.Same(originalInspector, snapshot.ClientHelloInspector);
         var clonedRoot = Assert.Single(snapshot.CertificateValidation.CustomTrustRoots!);
         Assert.NotSame(pki.Root, clonedRoot);

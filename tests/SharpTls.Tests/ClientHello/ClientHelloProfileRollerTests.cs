@@ -102,8 +102,10 @@ public sealed class ClientHelloProfileRollerTests
             Limits = TlsLimits.Default with { MaxEarlyDataSize = 321 },
             CertificateValidation = new CustomTlsCertificateValidationOptions
             {
+                DangerouslySkipServerCertificateValidation = true,
                 RevocationMode = X509RevocationMode.Offline,
                 RevocationFlag = X509RevocationFlag.EntireChain,
+                AllowUnknownRevocationStatus = false,
                 DisableCertificateDownloads = true,
                 UrlRetrievalTimeout = TimeSpan.FromSeconds(3),
                 MinimumValidSignedCertificateTimestamps = 2,
@@ -143,6 +145,8 @@ public sealed class ClientHelloProfileRollerTests
         Assert.Equal(321, clone.Limits.MaxEarlyDataSize);
         Assert.Equal(X509RevocationMode.Offline, clone.CertificateValidation.RevocationMode);
         Assert.Equal(X509RevocationFlag.EntireChain, clone.CertificateValidation.RevocationFlag);
+        Assert.False(clone.CertificateValidation.AllowUnknownRevocationStatus);
+        Assert.True(clone.CertificateValidation.DangerouslySkipServerCertificateValidation);
         Assert.True(clone.CertificateValidation.DisableCertificateDownloads);
         Assert.Equal(2, clone.CertificateValidation.MinimumValidSignedCertificateTimestamps);
         Assert.False(clone.TcpNoDelay);

@@ -24,6 +24,7 @@ public sealed class TlsConnectionState
         bool usedHelloRetryRequest,
         bool sessionWasResumed,
         bool externalPskWasSelected,
+        bool serverCertificateValidationSkipped,
         Tls13EarlyDataStatus earlyDataStatus,
         bool encryptedClientHelloOffered,
         bool encryptedClientHelloAccepted,
@@ -52,6 +53,7 @@ public sealed class TlsConnectionState
         UsedHelloRetryRequest = usedHelloRetryRequest;
         SessionWasResumed = sessionWasResumed;
         ExternalPskWasSelected = externalPskWasSelected;
+        ServerCertificateValidationSkipped = serverCertificateValidationSkipped;
         EarlyDataStatus = earlyDataStatus;
         EncryptedClientHelloOffered = encryptedClientHelloOffered;
         EncryptedClientHelloAccepted = encryptedClientHelloAccepted;
@@ -73,7 +75,10 @@ public sealed class TlsConnectionState
         PeerClosed = peerClosed;
     }
 
-    /// <summary>Gets the normalized reference identity authenticated by TLS.</summary>
+    /// <summary>
+    /// Gets the normalized reference identity. It is certificate-authenticated unless
+    /// <see cref="ServerCertificateValidationSkipped"/> is true.
+    /// </summary>
     public string AuthenticatedServerName { get; }
     /// <summary>Gets the negotiated TLS version.</summary>
     public TlsProtocolVersion ProtocolVersion { get; }
@@ -89,6 +94,8 @@ public sealed class TlsConnectionState
     public bool SessionWasResumed { get; }
     /// <summary>Gets whether an explicitly configured external PSK authenticated the peer.</summary>
     public bool ExternalPskWasSelected { get; }
+    /// <summary>Gets whether the explicit dangerous option bypassed server PKI/name validation.</summary>
+    public bool ServerCertificateValidationSkipped { get; }
     /// <summary>Gets the final early-data outcome.</summary>
     public Tls13EarlyDataStatus EarlyDataStatus { get; }
     /// <summary>Gets whether real ECH was offered.</summary>
@@ -121,7 +128,7 @@ public sealed class TlsConnectionState
     /// or null for TLS 1.3 where that binding is not defined.
     /// </summary>
     public byte[]? TlsUnique => _tlsUnique is null ? null : (byte[])_tlsUnique.Clone();
-    /// <summary>Gets defensive DER copies of the authenticated peer certificate chain.</summary>
+    /// <summary>Gets defensive DER copies of the peer certificate chain.</summary>
     public IReadOnlyList<byte[]> PeerCertificateChain => Array.AsReadOnly(CloneJagged(_peerCertificateChain));
     /// <summary>Gets a copy of the stapled OCSP response, or null.</summary>
     public byte[]? StapledOcspResponse =>

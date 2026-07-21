@@ -181,6 +181,36 @@ public sealed class Tls13SessionTests
     }
 
     [Fact]
+    public void CacheSeparatesValidatedAndDangerouslyUnvalidatedOrigins()
+    {
+        var clock = new ManualTimeProvider(
+            new DateTimeOffset(2026, 7, 21, 12, 0, 0, TimeSpan.Zero));
+        using var cache = new Tls13SessionCache(4, 4, TimeSpan.FromHours(1), clock);
+        var unvalidatedOrigin = Tls13SessionOrigin.Create(
+            "example.com",
+            443,
+            certificateValidationSkipped: true);
+        cache.Add(CreateTicket(
+            unvalidatedOrigin,
+            TlsCipherSuite.TlsAes128GcmSha256,
+            null,
+            [1],
+            clock.GetUtcNow(),
+            clock.GetUtcNow().AddMinutes(30),
+            clock.GetUtcNow().AddMinutes(30)));
+
+        Assert.Null(cache.TryTake(
+            Tls13SessionOrigin.Create("example.com", 443),
+            [TlsCipherSuite.TlsAes128GcmSha256],
+            []));
+        using var unvalidated = cache.TryTake(
+            unvalidatedOrigin,
+            [TlsCipherSuite.TlsAes128GcmSha256],
+            []);
+        Assert.NotNull(unvalidated);
+    }
+
+    [Fact]
     public void CacheSeparatesPlainAndExactEchConfigurationSources()
     {
         var clock = new ManualTimeProvider(
@@ -376,7 +406,10 @@ public sealed class Tls13SessionTests
     {
         var now = new DateTimeOffset(2026, 7, 18, 12, 0, 0, TimeSpan.Zero);
         var clock = new ManualTimeProvider(now);
-        var origin = Tls13SessionOrigin.Create("Private.Example.", 443);
+        var origin = Tls13SessionOrigin.Create(
+            "Private.Example.",
+            443,
+            certificateValidationSkipped: true);
         var identity = Convert.FromHexString("0102030405060708");
         var psk = Enumerable.Repeat((byte)0xA5, 32).ToArray();
         var echBinding = SHA256.HashData("ECHConfigList"u8);
@@ -415,6 +448,16 @@ public sealed class Tls13SessionTests
         destination.ImportEncrypted(protectedState, rotatedProtector);
 
         Assert.Equal(1, destination.Count);
+        Assert.Null(destination.TryTake(
+            Tls13SessionOrigin.Create("private.example", 443),
+            [TlsCipherSuite.TlsAes128GcmSha256],
+            ["http/1.1"],
+            echBinding,
+            TlsApplicationSettingsCodePoint.LegacyDraft,
+            new Dictionary<string, byte[]>
+            {
+                ["http/1.1"] = clientApplicationSettings,
+            }));
         using var restored = destination.TryTake(
             origin,
             [TlsCipherSuite.TlsChaCha20Poly1305Sha256],
@@ -533,6 +576,35 @@ public sealed class Tls13SessionTests
             malformed[6] = 2;
             Assert.Throws<InvalidDataException>(() => destination.ImportStatePlaintext(malformed));
             Assert.Equal(1, destination.Count);
+
+            var validationModeOffset = 4 + 1 + 2 + 2 + origin.Host.Length + 2;
+            var invalidValidationMode = (byte[])plaintext.Clone();
+            invalidValidationMode[validationModeOffset] = 2;
+            Assert.Throws<InvalidDataException>(() =>
+                destination.ImportStatePlaintext(invalidValidationMode));
+            Assert.Equal(1, destination.Count);
+            CryptographicOperations.ZeroMemory(malformed);
+            CryptographicOperations.ZeroMemory(invalidValidationMode);
+
+            var legacyVersion3 = new byte[plaintext.Length - 1];
+            plaintext.AsSpan(0, validationModeOffset).CopyTo(legacyVersion3);
+            plaintext.AsSpan(validationModeOffset + 1).CopyTo(
+                legacyVersion3.AsSpan(validationModeOffset));
+            legacyVersion3[4] = 3;
+            using (var legacyDestination = new Tls13SessionCache(
+                4,
+                4,
+                TimeSpan.FromHours(1),
+                clock))
+            {
+                legacyDestination.ImportStatePlaintext(legacyVersion3);
+                using var restoredLegacy = legacyDestination.TryTake(
+                    origin,
+                    [TlsCipherSuite.TlsAes128GcmSha256],
+                    []);
+                Assert.NotNull(restoredLegacy);
+            }
+            CryptographicOperations.ZeroMemory(legacyVersion3);
 
             clock.Advance(TimeSpan.FromMinutes(2));
             destination.ImportStatePlaintext(plaintext);

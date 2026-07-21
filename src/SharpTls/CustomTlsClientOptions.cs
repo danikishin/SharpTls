@@ -288,7 +288,9 @@ public sealed class CustomTlsClientOptions
                 roots,
                 CertificateValidation.EvidenceValidator,
                 CertificateValidation.RequireValidStapledOcspResponse,
-                CertificateValidation.MinimumValidSignedCertificateTimestamps);
+                CertificateValidation.MinimumValidSignedCertificateTimestamps,
+                CertificateValidation.AllowUnknownRevocationStatus,
+                CertificateValidation.DangerouslySkipServerCertificateValidation);
 
             return new CustomTlsClientConfiguration(
                 ServerName,
